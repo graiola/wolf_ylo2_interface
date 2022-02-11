@@ -1,0 +1,5 @@
+#ifndef YLO2_MOTEUS_CONTROLLER_H
+#define YLO2_MOTEUS_CONTROLLER_H
+
+
+#endif
