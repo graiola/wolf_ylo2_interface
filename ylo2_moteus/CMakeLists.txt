@@ -15,10 +15,6 @@ endif()
 include_directories(include/)
 
 find_package(ament_cmake REQUIRED)
-#find_package(rclcpp REQUIRED)
-#find_package(std_msgs REQUIRED)
-#find_package(sensor_msgs REQUIRED)
-#find_package(k3lso_msgs REQUIRED)
 
 file(GLOB MOTEUS_PCAN_SRC src/moteus_pcan/*.cpp)
 
@@ -27,7 +23,7 @@ target_link_libraries(ylo2_moteus_node ${CAN_LIBS})
 ament_target_dependencies(ylo2_moteus_node ) #rclcpp std_msgs sensor_msgs k3lso_msgs)
 
 install(TARGETS
-k3lso_moteus_node
+ylo2_moteus_node
   DESTINATION lib/${PROJECT_NAME})
 
 ament_package()

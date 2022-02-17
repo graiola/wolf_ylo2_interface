@@ -105,4 +105,8 @@ MoteusPcanController controller(interface_motors_map);
 
 memos :
 
-_interfaces.push_back(valeur)    =  ajoute "valeur" au conteneur de liste existant "_interfaces"
+_interfaces.push_back(valeur),  ajoute "valeur" au conteneur de liste existant "_interfaces"
+_interfaces.back(),             retourne la derniere valeur de la liste "_interfaces"
+
+a->b   est similaire à  "a.b" mais concerne les pointeurs   soit : (pointer_name)->(variable_name)
+

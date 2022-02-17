@@ -17,7 +17,6 @@ MoteusPcanMotor::MoteusPcanMotor(uint32_t id, PCANDevice* can_device_ptr)
 {
     
     // TX STOP PACKAGE
-
     _msg_tx_stop.id = 0x8000 | id;
     _msg_tx_stop.length = 5;
     // Write Mode
@@ -31,17 +30,16 @@ MoteusPcanMotor::MoteusPcanMotor(uint32_t id, PCANDevice* can_device_ptr)
 
 
     // TX POS PACKAGE for Tau mode only (torque, kp=0, kd=0)
-    
     _msg_tx_pos.id = 0x8000 | id;
-    _msg_tx_pos.length = 32;  // TODO less ?
+    _msg_tx_pos.length = 32;  // TODO: less bytes ?
     // Write Mode
     _msg_tx_pos.data[0] = 0x01; // Write uint8 (0x00) | Write 1 register (0x01)
     _msg_tx_pos.data[1] = 0x00; // Register to write: MODE
     _msg_tx_pos.data[2] = 0x0A; // Value to write: POSITION MODE
     // Write command
     _msg_tx_pos.data[3] = 0x0C; // Write floats
-    _msg_tx_pos.data[4] = 0x03; // Write 3 registers
-    _msg_tx_pos.data[5] = 0x22; // Starting register: fftorqueCOMM, KP_SCALE, KD_SCALE
+    _msg_tx_pos.data[4] = 0x01; // Write 3 registers
+    _msg_tx_pos.data[5] = 0x22; // Starting register: fftorqueCOMM
     // Query
     _msg_tx_pos.data[30] = 0x1F; // Read floats (0x1C) | Read 3 registers (0x03)
     _msg_tx_pos.data[31] = 0x01; // Starting register: POSITION, VELOCITY, TORQUE
@@ -50,38 +48,16 @@ MoteusPcanMotor::MoteusPcanMotor(uint32_t id, PCANDevice* can_device_ptr)
     _comm_position = 0.0;
     _comm_velocity = 0.0;
     _comm_fftorque = 0.0;
-    _comm_kp_scale = 60.0;
-    _comm_kd_scale = 5.0;
-    _comm_maxtorqu = 5.0;
+    _comm_kp_scale = 0.0;
+    _comm_kd_scale = 0.0;
+    _comm_maxtorqu = 2.0; // 10
 }
 
 MoteusPcanMotor::~MoteusPcanMotor(){}
 
-void MoteusPcanMotor::set_commands(float position, float velocity, float fftorque, float kp_scale, float kd_scale){
+void MoteusPcanMotor::set_commands(float fftorque){
     std::lock_guard<std::mutex> guard(_command_mutex);
-    _comm_position = position;
-    _comm_velocity = velocity;
     _comm_fftorque = fftorque;
-    _comm_kp_scale = kp_scale;
-    _comm_kd_scale = kd_scale;
-}
-
-void MoteusPcanMotor::set_commands(float position, float velocity, float fftorque){
-    std::lock_guard<std::mutex> guard(_command_mutex);
-    _comm_position = position;
-    _comm_velocity = velocity;
-    _comm_fftorque = fftorque;
-}
-
-void MoteusPcanMotor::set_commands(float position, float velocity){
-    std::lock_guard<std::mutex> guard(_command_mutex);
-    _comm_position = position;
-    _comm_velocity = velocity;
-}
-
-void MoteusPcanMotor::set_commands(float position){
-    std::lock_guard<std::mutex> guard(_command_mutex);
-    _comm_position = position;
 }
 
 void MoteusPcanMotor::get_feedback(float& position, float& velocity, float& torque){
@@ -125,7 +101,7 @@ bool MoteusPcanMotor::write_read(){
         }else{
             {
                 std::lock_guard<std::mutex> guard(_command_mutex);
-                memcpy(&_msg_tx_pos.data[MSGTX_ADDR_FFTORQUE], &_comm_fftorque, sizeof(float));
+                memcpy(&_msg_tx_pos.data[6], &_comm_fftorque, sizeof(float));
 
             }
             #ifdef PRINT_TX
@@ -158,5 +134,6 @@ bool MoteusPcanMotor::write_read(){
         std::this_thread::sleep_for(20ms);
         _position = _comm_position;
     #endif
+
     return true;
 }

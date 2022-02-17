@@ -1,4 +1,5 @@
 #include "wolf_ylo2_interface/ylo2_robot_hw.hpp"
+//TODO #include "ylo2_moteus/???"
 
 namespace ylo22ros
 {
@@ -56,23 +57,28 @@ void ylo2RobotHw::init()
       return;
     }
 
-    ylo2_interface_.InitCmdData(ylo2_lowcmd_);
+
+    // ylo2_interface_.InitCmdData(ylo2_lowcmd_);
+    // replace each ylo2_interface_. to moteus ones
+    //TODO fonction initialize
     startup_routine();
 }
 
 void ylo2RobotHw::read()
 {
     // Get robot data
-    ylo2_state_ = ylo2_interface_.ReceiveObservation();
+    //ylo2_state_ = ylo2_interface_.ReceiveObservation();
+    // replace each ylo2_interface_. to moteus ones
+    //TODO fonction read
 
     // ------
     // Joints
     // ------
     for (unsigned int jj = 0; jj < n_dof_; ++jj)
     {
-        joint_position_[jj] = static_cast<double>(ylo2_state_.motorState[ylo2_motor_idxs_[jj]].q)     ;
-        joint_velocity_[jj] = static_cast<double>(ylo2_state_.motorState[ylo2_motor_idxs_[jj]].dq)    ;
-        joint_effort_[jj]   = static_cast<double>(ylo2_state_.motorState[ylo2_motor_idxs_[jj]].tauEst);
+        joint_position_[jj] = static_cast<double>(ylo2_state_.motorState[ylo2_motor_idxs_[jj]].q)     ; // pos
+        joint_velocity_[jj] = static_cast<double>(ylo2_state_.motorState[ylo2_motor_idxs_[jj]].dq)    ; // vel
+        joint_effort_[jj]   = static_cast<double>(ylo2_state_.motorState[ylo2_motor_idxs_[jj]].tauEst); // torque
     }
 
     // ---
@@ -97,14 +103,17 @@ void ylo2RobotHw::write()
     for (unsigned int jj = 0; jj < n_dof_; ++jj)
       ylo2_lowcmd_.motorCmd[ylo2_motor_idxs_[jj]].tau = static_cast<float>(joint_effort_command_[jj]  );
 
-    ylo2_interface_.SendLowCmd(ylo2_lowcmd_);
+    //ylo2_interface_.SendLowCmd(ylo2_lowcmd_);
+    // replace each ylo2_interface_. to moteus ones
+    //TODO fonction send fftorque
 }
 
 void ylo2RobotHw::send_zero_command()
 {
     std::array<float, 60> zero_command = {0};
-    // ylo2_interface_->SendCommand(zero_command);
-    ylo2_interface_.SendCommand(zero_command);
+    // ylo2_interface_->SendCommand(zero_command); is equal to  // ylo2_interface_.SendCommand(zero_command); but for pointer
+    // replace each ylo2_interface_. to moteus ones
+    //TODO fonction zeroing_command
 }
 
 void ylo2RobotHw::startup_routine()
