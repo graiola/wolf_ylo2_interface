@@ -18,13 +18,8 @@ ylo2ROSControl::~ylo2ROSControl()
 
 void ylo2ROSControl::init()
 {
-    ROS_INFO_NAMED(CLASS_NAME,"Initializing ylo2ROSControl");
-
 	// Reset RobotHW
 	robot_hw_.reset(new ylo22ros::ylo2RobotHw);
-
-	// Reseting the namespace of the node handle
-	node_handle_.reset(new ros::NodeHandle(robot_hw_->getRobotName()));
 
 	// Initializing the hardware interface
 	robot_hw_->init();
