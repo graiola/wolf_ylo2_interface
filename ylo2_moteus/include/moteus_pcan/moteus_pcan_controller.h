@@ -22,20 +22,10 @@ public:
 
     bool set_torque_ena(bool torque_ena);
     bool set_torque_ena(bool torque_ena, int id);
-    bool set_torque_ena(bool torque_ena, std::vector<int> ids);
 
     // send to individual controller ID
-    bool set_command(int id, float position, float velocity, float fftorque, float kp_scale, float kd_scale);
-    bool set_command(int id, float position, float velocity, float fftorque);
-    bool set_command(int id, float position, float velocity);
-    bool set_command(int id, float position);
-
-    // Send to multiple controllers ID
-    bool set_command(std::vector<int> ids, std::vector<float> position, std::vector<float> velocity, std::vector<float> fftorque, 
-                     std::vector<float> kp_scale, std::vector<float> kd_scale);
-    bool set_command(std::vector<int> ids, std::vector<float> position, std::vector<float> velocity, std::vector<float> fftorque);
-    bool set_command(std::vector<int> ids, std::vector<float> position, std::vector<float> velocity);
-    bool set_command(std::vector<int> ids, std::vector<float> position);
+    bool set_command(int id, float fftorque);
+    //bool set_command(int id, float fftorque);
 
     std::vector<int> get_freqs();
     std::map<int, MoteusPcanMotorPtr> _motors; // Volver privado de nuevo

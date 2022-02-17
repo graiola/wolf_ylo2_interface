@@ -1,13 +1,9 @@
+// File adapted for Ylo2 robot, for pure torque commands
+
 #include "moteus_pcan/moteus_pcan_motor.h"
 #include "moteus_pcan/utils.h"
 
-#define MSGTX_ADDR_POSITION 0x06
-#define MSGTX_ADDR_VELOCITY 0x0A
-#define MSGTX_ADDR_FFTORQUE 0x0E
-#define MSGTX_ADDR_KP_SCALE 0x12
-#define MSGTX_ADDR_KD_SCALE 0x16
-#define MSGTX_ADDR_MAXTORQU 0x1A
-
+// RX
 #define MSGRX_ADDR_POSITION 0x02
 #define MSGRX_ADDR_VELOCITY 0x06
 #define MSGRX_ADDR_TORQUE   0x0A
@@ -21,6 +17,7 @@ MoteusPcanMotor::MoteusPcanMotor(uint32_t id, PCANDevice* can_device_ptr)
 {
     
     // TX STOP PACKAGE
+
     _msg_tx_stop.id = 0x8000 | id;
     _msg_tx_stop.length = 5;
     // Write Mode
@@ -33,17 +30,18 @@ MoteusPcanMotor::MoteusPcanMotor(uint32_t id, PCANDevice* can_device_ptr)
 
 
 
-    // TX POS PACKAGE
+    // TX POS PACKAGE for Tau mode only (torque, kp=0, kd=0)
+    
     _msg_tx_pos.id = 0x8000 | id;
-    _msg_tx_pos.length = 32;
+    _msg_tx_pos.length = 32;  // TODO less ?
     // Write Mode
     _msg_tx_pos.data[0] = 0x01; // Write uint8 (0x00) | Write 1 register (0x01)
     _msg_tx_pos.data[1] = 0x00; // Register to write: MODE
     _msg_tx_pos.data[2] = 0x0A; // Value to write: POSITION MODE
     // Write command
     _msg_tx_pos.data[3] = 0x0C; // Write floats
-    _msg_tx_pos.data[4] = 0x06; // Write 6 registers
-    _msg_tx_pos.data[5] = 0x20; // Starting register: positionCOMM, velocityCOMM, fftorqueCOMM, KP_SCALE, KD_SCALE, MAX_TORQUE
+    _msg_tx_pos.data[4] = 0x03; // Write 3 registers
+    _msg_tx_pos.data[5] = 0x22; // Starting register: fftorqueCOMM, KP_SCALE, KD_SCALE
     // Query
     _msg_tx_pos.data[30] = 0x1F; // Read floats (0x1C) | Read 3 registers (0x03)
     _msg_tx_pos.data[31] = 0x01; // Starting register: POSITION, VELOCITY, TORQUE
@@ -127,12 +125,8 @@ bool MoteusPcanMotor::write_read(){
         }else{
             {
                 std::lock_guard<std::mutex> guard(_command_mutex);
-                memcpy(&_msg_tx_pos.data[MSGTX_ADDR_POSITION], &_comm_position, sizeof(float));
-                memcpy(&_msg_tx_pos.data[MSGTX_ADDR_VELOCITY], &_comm_velocity, sizeof(float));
                 memcpy(&_msg_tx_pos.data[MSGTX_ADDR_FFTORQUE], &_comm_fftorque, sizeof(float));
-                memcpy(&_msg_tx_pos.data[MSGTX_ADDR_KP_SCALE], &_comm_kp_scale, sizeof(float));
-                memcpy(&_msg_tx_pos.data[MSGTX_ADDR_KD_SCALE], &_comm_kd_scale, sizeof(float));
-                memcpy(&_msg_tx_pos.data[MSGTX_ADDR_MAXTORQU], &_comm_maxtorqu, sizeof(float));
+
             }
             #ifdef PRINT_TX
                 print_message(_msg_tx_pos);

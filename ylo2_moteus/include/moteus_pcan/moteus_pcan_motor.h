@@ -13,14 +13,17 @@
 class MoteusPcanMotor{
 public:
     MoteusPcanMotor(uint32_t id, PCANDevice* can_device_ptr);
+
     ~MoteusPcanMotor();
+
     bool write_read();
-    void set_commands(float position, float velocity, float fftorque, float kp_scale, float kd_scale);
-    void set_commands(float position, float velocity, float fftorque);
-    void set_commands(float position, float velocity);
-    void set_commands(float position);
+
+    void set_commands(float fftorque);
+
     void get_feedback(float& position, float& velocity, float& torque);
+
     void set_torque_ena(bool torque_ena_);
+
 private:
     // CAN
     uint32_t _id;
