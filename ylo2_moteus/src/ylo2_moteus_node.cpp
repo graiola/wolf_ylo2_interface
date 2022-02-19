@@ -54,20 +54,38 @@ MoteusInterfaceMotorsMap interface_motors_map = {
 
 MoteusPcanController controller(interface_motors_map);
 
+
+// active ou non le torque via true/false, et l'id du moteur
+void set_torque(bool choice, int motor_id)
+    {
+    auto state = choice;
+    auto id = motor_id;
+    controller._motors[id]->set_torque_ena(state);
+    std::cout("torque switch on/off activated.");
+    }
+
+
+// affiche pos, vel, tor, pour les 12 moteurs
+void query()
+    {
+    for(const auto& motor_info: motors_info)
+        {
+        int motor_id = motor_info.can_id;
+        float pos, vel, tor;
+        controller._motors[motor_id]->get_feedback(pos, vel, tor);
+        std::cout(pos, vel, tor);
+        }
+
 /*
-void set_torque(bool choice, int motor_id))
+void timer_freqs_callback()
     {
-        auto state = choice;
-        auto id = request->ids[motor_id];
-        controller._motors[id]->set_torque_ena(state, id);
-        std::cout("torque activated on selected motor.")
+    float msg;
+    msg.data = controller.get_freqs();
+    publisher_freqs->publish(msg);
     }
+*/
 
-void query(int motor_id, float position, float velocity, float fftorque)
-    {
-
-    }
-
+/*
 void send_tau(int motor_id, float torque)
     {
 
@@ -81,7 +99,7 @@ int main(int argc, char **argv)
     if(!controller.is_initialized()){
         std::cout("Could not initialize Moteus controllers.");
         return 1;
-    }
+        }
 
     // start all 12 moteus controllers
     controller.start();
@@ -91,5 +109,9 @@ int main(int argc, char **argv)
         std::cout("One or more Moteus controllers are not running.");
         break;
         }
-    }
+    std::cout("motors running !!!");
+
+    query();
+
+    set_torque(true, 03);
 }
