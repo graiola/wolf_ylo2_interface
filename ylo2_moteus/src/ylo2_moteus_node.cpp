@@ -1,10 +1,11 @@
 #include <iostream>
 #include <string.h>
 #include <sstream>
+#include <unistd.h> // used for usleep command
 
 #include "moteus_pcan/moteus_pcan_controller.h"
 
-using namespace std::chrono_literals;
+using namespace std;
 
 struct MotorInfo{
     std::string joint_name;
@@ -19,6 +20,10 @@ std::vector<MotorInfo> motors_info = {
 
     // joint_name;      can_interface;   can_id;   offset;   invert;
     // lf_leg
+
+    // TODO : joint_names aren't used for now.
+    // is my can_interface call correct ?
+
     {"lf_haa_joint",    "PCAN_PCIBUS1",    1,      0.00,     true},
     {"lf_hfe_joint",    "PCAN_PCIBUS1",    2,      0.00,     true},
     {"lf_kfe_joint",    "PCAN_PCIBUS1",    3,      0.00,     true},
@@ -40,7 +45,7 @@ std::vector<MotorInfo> motors_info = {
 };
 
 
-// les moteurs 1,2 et 3 sont connectés au bus PCAN_PCIBUS1 de la carte PEAK FDCAN PCI M2...
+// PEAK FDCAN PCI M2 has 4 ports and each port controls one leg (3 moteus_controllers)
 MoteusInterfaceMotorsMap interface_motors_map = {
 
     {"PCAN_PCIBUS1", {1}}, {"PCAN_PCIBUS1", {2}}, {"PCAN_PCIBUS1", {3}},
@@ -55,47 +60,48 @@ MoteusInterfaceMotorsMap interface_motors_map = {
 MoteusPcanController controller(interface_motors_map);
 
 
-// active ou non le torque via true/false, et l'id du moteur
+// torque switch on/off, and target ID 
 void set_torque(bool choice, int motor_id)
     {
     auto state = choice;
     auto id = motor_id;
-    controller._motors[id]->set_torque_ena(state);
+    // send pcan order, using correct port (ex:PCAN_PCIBUS1), target id, and state
+
+    // TODO : controller._motors[moteus_id] calls the target id, and it specific can_port ??
+    controller._motors[id]->set_torque_ena(state); 
     std::cout("torque switch on/off activated.");
     }
 
 
-// affiche pos, vel, tor, pour les 12 moteurs
-void query()
+
+// query position, velocity, and torque, for all 12 motors in order (1-12)
+int query()
     {
-    for(const auto& motor_info: motors_info)
+    for(const auto& motor_info: motors_info) // for the list of the 12 id's
         {
-        int motor_id = motor_info.can_id;
+        int motor_id = motor_info.can_id; // each id
         float pos, vel, tor;
-        controller._motors[motor_id]->get_feedback(pos, vel, tor);
-        std::cout(pos, vel, tor);
+        controller._motors[motor_id]->get_feedback(pos, vel, tor); // query values
         }
-
-/*
-void timer_freqs_callback()
-    {
-    float msg;
-    msg.data = controller.get_freqs();
-    publisher_freqs->publish(msg);
+        list commands = ;
+        return (controller._motors);
     }
-*/
 
-/*
+
+// send fftorque order to specific id, with specific torque
 void send_tau(int motor_id, float torque)
     {
-
+        auto id = motor_id;
+        float fftorque = torque;
+        controller._motors[id]->set_commands(fftorque);
     }
 
-*/
 
 int main(int argc, char **argv)
 {
-    // initializing all 12 moteus controllers
+    // initializing all 12 moteus controllers. 
+    // Opens all ports present in interface_motors_map ?
+    // pass initialization if port already open ? (ex: i have 3 times same port !)
     if(!controller.is_initialized()){
         std::cout("Could not initialize Moteus controllers.");
         return 1;
@@ -105,13 +111,25 @@ int main(int argc, char **argv)
     controller.start();
     
     // check if all 12 moteus controllers are running
-    if(!controller.all_running()){
+    if(!controller.all_running())
+        {
         std::cout("One or more Moteus controllers are not running.");
         break;
         }
+
     std::cout("motors running !!!");
 
-    query();
+    int query_pos_vel_tor = query(); // query_pos_vel_tor is a list like this : query_pos_vel_tor = {{.1, .1, .1}, {.1, .1, .1}, {.1, .1, .1}....} for all 12 motors
 
-    set_torque(true, 03);
+    usleep(2000000); // sleep 2s
+
+    set_torque(true, 11); // activate torque for motor 11
+
+    usleep(2000000);
+
+    send_tau(11, 4.0); // send TAU (fftorque) order to motor 11, with a torque of 4.0
+
+    usleep(2000000);
+
+    set_torque(false, 11); // desactivate torque for motor 11
 }
