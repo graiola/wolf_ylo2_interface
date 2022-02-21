@@ -6,7 +6,7 @@ Based on (find the original moteus lib)
 
 Install pcandriver and pcanbasic: https://github.com/raess1/K3lso-CAN-communication
 ## Thanks to Robin Frojd, for it public package
-
+## Big thanks to Quincy Jones, for it public moteus_pcan_controller library
 moteus_pcan_motor.h   contient les adresses hexa des données, ainsi que la fonction read/write
 
 _motors[id] = std::make_shared<MoteusPcanMotor>(id, &_can_device);       dans moteus_pcan_interface
