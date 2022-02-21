@@ -120,16 +120,20 @@ int main(int argc, char **argv)
     std::cout("motors running !!!");
 
     int query_pos_vel_tor = query(); // query_pos_vel_tor is a list like this : query_pos_vel_tor = {{.1, .1, .1}, {.1, .1, .1}, {.1, .1, .1}....} for all 12 motors
+    // or perhaps easier : MoteusPcanMotor::get_feedback(&position, &velocity, &torque)
 
     usleep(2000000); // sleep 2s
 
     set_torque(true, 11); // activate torque for motor 11
+    // or perhaps easier : MoteusPcanController::set_torque_ena(true);
 
     usleep(2000000);
 
     send_tau(11, 4.0); // send TAU (fftorque) order to motor 11, with a torque of 4.0
+    // or perhaps easier : MoteusPcanController::set_command(11, 4.0)
 
     usleep(2000000);
 
     set_torque(false, 11); // desactivate torque for motor 11
+    // or perhaps easier : MoteusPcanController::set_torque_ena(false);
 }
