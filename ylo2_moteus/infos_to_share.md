@@ -45,9 +45,15 @@ I propose U this md file to share infos, or anything else about ylo2 controller 
     
     controller.start()
 
-            this controller starts the 12 motors
+            Is this function acting as a guard ? I failed to decrypt the function (too hard for my knowledge)
     
     controller.all_running()
 
-            this function checks that all 12 motors are ok
+            this function checks that the 4 PCAN_PCIBUS are always opened, I think (lol)
     
+
+
+Well, I do my best to make a gateway, learning the existing libraries, with my actual c++ knowledge.
+I don't anderstand anything about pointers, ~, and memory leaks, sorry.  (if only i could code python, lol)
+
+Impatient to read U Gennaro
