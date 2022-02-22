@@ -38,7 +38,7 @@ MoteusPcanMotor::MoteusPcanMotor(uint32_t id, PCANDevice* can_device_ptr)
     _msg_tx_pos.data[2] = 0x0A; // Value to write: POSITION MODE
     // Write command
     _msg_tx_pos.data[3] = 0x0C; // Write floats
-    _msg_tx_pos.data[4] = 0x01; // Write 3 registers
+    _msg_tx_pos.data[4] = 0x01; // Write only 1 register
     _msg_tx_pos.data[5] = 0x22; // Starting register: fftorqueCOMM
     // Query
     _msg_tx_pos.data[30] = 0x1F; // Read floats (0x1C) | Read 3 registers (0x03)
