@@ -18,15 +18,15 @@ controller._motors[id]->get_feedback(float& position, float& velocity, float& to
 
 write_read() envoie et recoit les commandes
 
-            memcpy(&_msg_tx_pos.data[MSGTX_ADDR_FFTORQUE], &_comm_fftorque, sizeof(float));
+            memcpy(&_tx_msg.data[MSGTX_ADDR_FFTORQUE], &_comm_fftorque, sizeof(float));
             ...
-            _can_device_ptr->Send(_msg_tx_pos);
+            _can_device_ptr->Send(_tx_msg);
 
 
-            memcpy(&_position, &_msg_rx.data[MSGRX_ADDR_POSITION], sizeof(float));
-            memcpy(&_velocity, &_msg_rx.data[MSGRX_ADDR_VELOCITY], sizeof(float));
-            memcpy(&_torque,   &_msg_rx.data[MSGRX_ADDR_TORQUE],   sizeof(float));
-            _can_device_ptr->Receive(_msg_rx);
+            memcpy(&_position, &_rx_msg.data[MSGRX_ADDR_POSITION], sizeof(float));
+            memcpy(&_velocity, &_rx_msg.data[MSGRX_ADDR_VELOCITY], sizeof(float));
+            memcpy(&_torque,   &_rx_msg.data[MSGRX_ADDR_TORQUE],   sizeof(float));
+            _can_device_ptr->Receive(_rx_msg);
 
 
 

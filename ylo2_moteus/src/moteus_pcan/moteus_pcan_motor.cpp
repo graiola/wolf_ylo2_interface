@@ -17,7 +17,7 @@ MoteusPcanMotor::MoteusPcanMotor(uint32_t id, PCANDevice* can_device_ptr)
 {
     
     // TX STOP PACKAGE
-    _msg_tx_stop.id = 0x8000 | id;
+    _msg_tx_stop.id = 0x8000 | id; // in moteus lib, for example 0x8002 means 80 = query values, and 02 = ID
     _msg_tx_stop.length = 5;
     // Write Mode
     _msg_tx_stop.data[0] = 0x01; // Write uint8 (0x00) | Write 1 register (0x01)
@@ -27,23 +27,25 @@ MoteusPcanMotor::MoteusPcanMotor(uint32_t id, PCANDevice* can_device_ptr)
     _msg_tx_stop.data[3] = 0x1F; // Read floats (0x1C) | Read 3 registers (0x03)
     _msg_tx_stop.data[4] = 0x01; // Starting register: POSITION, VELOCITY, TORQUE
 
-
+    // -----------------------------------------------------------------------------
 
     // TX POS PACKAGE for Tau mode only (torque, kp=0, kd=0)
-    _msg_tx_pos.id = 0x8000 | id;
-    _msg_tx_pos.length = 32;  // TODO: less bytes ?
+    _tx_msg.id = 0x8000 | id;
+    _tx_msg.length = 32;  // TODO: less bytes ?
     // Write Mode
-    _msg_tx_pos.data[0] = 0x01; // Write uint8 (0x00) | Write 1 register (0x01)
-    _msg_tx_pos.data[1] = 0x00; // Register to write: MODE
-    _msg_tx_pos.data[2] = 0x0A; // Value to write: POSITION MODE
+    _tx_msg.data[0] = 0x01; // Write uint8 (0x00) | Write 1 register (0x01)
+    _tx_msg.data[1] = 0x00; // Register to write: MODE
+    _tx_msg.data[2] = 0x0A; // Value to write: POSITION MODE
     // Write command
-    _msg_tx_pos.data[3] = 0x0C; // Write floats
-    _msg_tx_pos.data[4] = 0x01; // Write only 1 register
-    _msg_tx_pos.data[5] = 0x22; // Starting register: fftorqueCOMM
+    _tx_msg.data[3] = 0x0C; // Write floats
+    _tx_msg.data[4] = 0x01; // Write 3 registers
+    _tx_msg.data[5] = 0x22; // Starting register: fftorqueCOMM
     // Query
-    _msg_tx_pos.data[30] = 0x1F; // Read floats (0x1C) | Read 3 registers (0x03)
-    _msg_tx_pos.data[31] = 0x01; // Starting register: POSITION, VELOCITY, TORQUE
+    _tx_msg.data[30] = 0x1F; // Read floats (0x1C) | Read 3 registers (0x03)
+    _tx_msg.data[31] = 0x01; // Starting register: POSITION, VELOCITY, TORQUE
     
+    // -----------------------------------------------------------------------------
+
     // Initial values
     _comm_position = 0.0;
     _comm_velocity = 0.0;
@@ -101,21 +103,21 @@ bool MoteusPcanMotor::write_read(){
         }else{
             {
                 std::lock_guard<std::mutex> guard(_command_mutex);
-                memcpy(&_msg_tx_pos.data[6], &_comm_fftorque, sizeof(float));
+                memcpy(&_tx_msg.data[6], &_comm_fftorque, sizeof(float));
 
             }
             #ifdef PRINT_TX
-                print_message(_msg_tx_pos);
+                print_message(_tx_msg);
             #endif
             #ifdef USE_PCAN
-                _can_device_ptr->Send(_msg_tx_pos);
+                _can_device_ptr->Send(_tx_msg); // send constructed PCAN message, for fftorque only, AND ask for pos, vel, torque
             #else
                 std::this_thread::sleep_for(10ms);
             #endif
         }
         // READ
         #ifdef USE_PCAN
-            if(!_can_device_ptr->Receive(_msg_rx)){
+            if(!_can_device_ptr->Receive(_rx_msg)){
                 return false;
             }
         #else
@@ -125,10 +127,11 @@ bool MoteusPcanMotor::write_read(){
             print_message(msg_rx);
         #endif
         {
-            std::lock_guard<std::mutex> guard(_feedback_mutex);
-            memcpy(&_position, &_msg_rx.data[MSGRX_ADDR_POSITION], sizeof(float));
-            memcpy(&_velocity, &_msg_rx.data[MSGRX_ADDR_VELOCITY], sizeof(float));
-            memcpy(&_torque,   &_msg_rx.data[MSGRX_ADDR_TORQUE],   sizeof(float));
+            // read is of course a possibility, however it is faster to do one transaction, so write and query in same command, thanks to 0x80..hexa (ex:L20)
+            std::lock_guard<std::mutex> guard(_feedback_mutex); 
+            memcpy(&_position, &_rx_msg.data[MSGRX_ADDR_POSITION], sizeof(float));
+            memcpy(&_velocity, &_rx_msg.data[MSGRX_ADDR_VELOCITY], sizeof(float));
+            memcpy(&_torque,   &_rx_msg.data[MSGRX_ADDR_TORQUE],   sizeof(float));
         }
     #else
         std::this_thread::sleep_for(20ms);

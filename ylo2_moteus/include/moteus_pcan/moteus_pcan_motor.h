@@ -29,8 +29,8 @@ private:
     uint32_t _id;
     PCANDevice* _can_device_ptr;
     CANDevice::CAN_msg_t _msg_tx_stop;
-    CANDevice::CAN_msg_t _msg_tx_pos;
-    CANDevice::CAN_msg_t _msg_rx;
+    CANDevice::CAN_msg_t _tx_msg;
+    CANDevice::CAN_msg_t _rx_msg;
     // Registers
     std::mutex _torque_ena_mutex;
     bool _torque_ena;
