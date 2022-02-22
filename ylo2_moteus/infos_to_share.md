@@ -11,9 +11,10 @@ I propose U this md file to share infos, or anything else about ylo2 controller 
 
 - ylo2_moteus_node.cpp is/should be  my gateway from moteus controller to Wolf controller.
 
-1 / due to the fact that for each leg, the 3 motors are connected to the same PCAN port, we need an interface_motors_map{}
+## 1 / due to the fact that for each leg, the 3 motors are connected to the same PCAN port, we need an interface_motors_map{}
 
-2 / functions :
+## 2 / my functions :
+
 
     void set_torque(bool choice, int motor_id) 
 
@@ -21,10 +22,32 @@ I propose U this md file to share infos, or anything else about ylo2 controller 
             when asking the id, the function automatically selects the correct port (controller._motors[id])
             Don't know if this function should return anything ?
 
+
     int query()
 
             this function query all motors contained in motor_info list
             it queries position, velocity and fftorque
             it return form should be : {{pos,vel,tor}, {pos,vel,tor},......}
                                             motor1        motor2     ......
-                                            
+
+
+    void send_tau(int motor_id, float torque)
+
+            this function send TAU to target id, with a target force
+            when asking the id, the function automatically selects the correct port (controller._motors[id])
+            Don't know if this function should return anything ?
+
+## 3 / General functions :
+
+    controller.is_initialized()
+
+            this function initialize all 4 PCAN ports (PCAN_PCIBUS1-4)
+    
+    controller.start()
+
+            this controller starts the 12 motors
+    
+    controller.all_running()
+
+            this function checks that all 12 motors are ok
+    
