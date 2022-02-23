@@ -77,11 +77,6 @@ void feedback(const char* serial_device, int baudrate)
     int sample_counter = 0;
 
     /*
-     * 	register a callback function to attribute changed event.
-     */
-    //sensor.register_attribute_callback(ex3_callback_attribute, 0);
-
-    /*
      * 	register a callback function to new data arrived event.
      */
     sensor.register_data_callback(ex3_callback_data, &sample_counter);
@@ -120,7 +115,6 @@ void feedback(const char* serial_device, int baudrate)
     while(true) // never stop ??!
     {
         Platform::msleep(100);
-        std::cout << ("\n");
     }
 
     /*
