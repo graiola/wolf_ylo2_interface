@@ -76,32 +76,32 @@ void ylo2RobotHw::read()
     // ------
     for (unsigned int jj = 0; jj < n_dof_; ++jj)
     {
-        joint_position_[jj] = static_cast<double>(ylo2_state_.motorState[ylo2_motor_idxs_[jj]].q)     ; // pos
-        joint_velocity_[jj] = static_cast<double>(ylo2_state_.motorState[ylo2_motor_idxs_[jj]].dq)    ; // vel
-        joint_effort_[jj]   = static_cast<double>(ylo2_state_.motorState[ylo2_motor_idxs_[jj]].tauEst); // torque
+        joint_position_[jj] = 0.0;
+        joint_velocity_[jj] = 0.0;
+        joint_effort_[jj]   = 0.0;
     }
 
     // ---
     // IMU
     // ---
-    imu_orientation_[0] = static_cast<double>(ylo2_state_.imu.quaternion[0]);  // w
-    imu_orientation_[1] = static_cast<double>(ylo2_state_.imu.quaternion[1]);  // x
-    imu_orientation_[2] = static_cast<double>(ylo2_state_.imu.quaternion[2]);  // y
-    imu_orientation_[3] = static_cast<double>(ylo2_state_.imu.quaternion[3]);  // z
+    imu_orientation_[0] = 0.0;  // w
+    imu_orientation_[1] = 0.0;  // x
+    imu_orientation_[2] = 0.0;  // y
+    imu_orientation_[3] = 0.0;  // z
 
-    imu_ang_vel_[0] = static_cast<double>(ylo2_state_.imu.gyroscope[0]);
-    imu_ang_vel_[1] = static_cast<double>(ylo2_state_.imu.gyroscope[1]);
-    imu_ang_vel_[2] = static_cast<double>(ylo2_state_.imu.gyroscope[2]);
+    imu_ang_vel_[0] = 0.0;
+    imu_ang_vel_[1] = 0.0;
+    imu_ang_vel_[2] = 0.0;
 
-    imu_lin_acc_[0] = static_cast<double>(ylo2_state_.imu.accelerometer[0]);
-    imu_lin_acc_[1] = static_cast<double>(ylo2_state_.imu.accelerometer[1]);
-    imu_lin_acc_[2] = static_cast<double>(ylo2_state_.imu.accelerometer[2]);
+    imu_lin_acc_[0] = 0.0;
+    imu_lin_acc_[1] = 0.0;
+    imu_lin_acc_[2] = 0.0;
 }
 
 void ylo2RobotHw::write()
 {
-    for (unsigned int jj = 0; jj < n_dof_; ++jj)
-      ylo2_lowcmd_.motorCmd[ylo2_motor_idxs_[jj]].tau = static_cast<float>(joint_effort_command_[jj]  );
+    //for (unsigned int jj = 0; jj < n_dof_; ++jj)
+      //ylo2_lowcmd_.motorCmd[ylo2_motor_idxs_[jj]].tau = static_cast<float>(joint_effort_command_[jj]  );
 
     //ylo2_interface_.SendLowCmd(ylo2_lowcmd_);
     // replace each ylo2_interface_. to moteus ones
@@ -119,7 +119,6 @@ void ylo2RobotHw::send_zero_command()
 void ylo2RobotHw::startup_routine()
 {
     send_zero_command();
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
 }
 
 } // namespace
