@@ -4,10 +4,11 @@
 #include <vector>
 #include <map>
 
-#include "myahrs_plus.hpp"
-using namespace WithRobot;
+#include "myahrs_plus.hpp" // myahrs+ imu lib
 
-static const char* SERIAL_DEVICE = "/dev/ttyACM0";
+using namespace WithRobot; // imu namespace lib
+
+static const char* SERIAL_DEVICE = "/dev/ttyACM0"; // Ylo2 USB port
 
 static const int BAUDRATE = 115200;
 
@@ -19,15 +20,30 @@ void handle_error(const char* error_msg)
     exit(1);
 }
 
+/*------------------------------------           Terminal return          --------------------------------------/
 
-/******************************************************************************************************************************
- *
- *  EXEMPLE
- *
- ******************************************************************************************************************************/
+0.18310.61040.79350.61040.36621.09871.40390.73240.0610-0.1221
+0.42730.30520.06100.18310.67140.85450.30520.12210.1831-0.3052
+-0.5493-0.3662-0.18310.00000.24410.30520.00000.12210.48830.2441
+-0.18310.18310.48830.30520.12210.79351.28180.97660.91561.0376
+0.85450.42730.24410.48830.67140.2441-0.24410.12210.91560.9766
+0.54930.0000-0.12210.0000-0.1221-0.7324-0.24410.3052-0.0610-0.3662
+-0.18310.18310.67140.30520.24410.12210.30520.30520.18310.4883
+                                                                    ( missing spaces between values! see L65 )
+
+  The order is quaternion, linear_acceleration, angular_velocity ( in Wolf order )
+/--------------------------------------------------------------------------------------------------------------*/
+
+// imu variable initialization :
+// ------------------------------
+
+// float imu_feedback(10); // 11 if temperature added
+std::vector<double> imu_feedback(10);
+
+
 void ex3_callback_attribute(void* context, int sensor_id, const char* attribute_name, const char* value)
 {
-    printf(" ## sensor_id %d, Attribute has been changed(%s, %s)\n", sensor_id, attribute_name, value);
+    //printf(" ## sensor_id %d, Attribute has been changed(%s, %s)\n", sensor_id, attribute_name, value);
 }
 
 void ex3_callback_data(void* context, int sensor_id, SensorData* sensor_data)
@@ -38,22 +54,22 @@ void ex3_callback_data(void* context, int sensor_id, SensorData* sensor_data)
     Quaternion& q = sensor_data->quaternion;
     ImuData<float>& imu = sensor_data->imu;
 
-/*
-    printf("%04d) sensor_id %d, Quaternion(xyzw)=%.4f,%.4f,%.4f,%.4f, Accel(xyz)=%.4f,%.4f,%.4f, \n\nGyro(xyz)=%.4f,%.4f,%.4f, Magnet(xyz)=%.2f,%.2f,%.2f\n",
-            *counter,
-            sensor_id,
-            q.x, q.y, q.z, q.w,
-            imu.ax, imu.ay, imu.az,
-            imu.gx, imu.gy, imu.gz,
-            imu.mx, imu.my, imu.mz);
-            */
-    printf("Gyro(xyz)=\nx: %.4f,\ny: %.4f,\nz: %.4f\n",
-            imu.ax, imu.ay, imu.az);
+    // without magnet values
+    float imu_feedback_old = (q.x, q.y, q.z, q.w, imu.ax, imu.ay, imu.az, imu.gx, imu.gy, imu.gz); 
+
+    imu_feedback = {q.x, q.y, q.z, q.w, imu.ax, imu.ay, imu.az, imu.gx, imu.gy, imu.gz};
+
+    // with magnet values too
+    // imu_feedback = (q.x, q.y, q.z, q.w, imu.ax, imu.ay, imu.az, imu.gx, imu.gy, imu.gz, imu.mx, imu.my, imu.mz); 
+
+    //printf("%.4f", imu_feedback_old);  // doesn't make space between values, 'cause no space in imu_feedback variable
+    printf("%.4f", imu_feedback); // testing with  a vector double of 10 elements.  Why it returns only 000 ?
+
 }
 
-void my_exemple(const char* serial_device, int baudrate)
+void feedback(const char* serial_device, int baudrate)
 {
-    printf("\nSTARTING IMU FEEDBACK...\n");
+    //printf("\nSTARTING IMU FEEDBACK...\n");
 
     MyAhrsPlus sensor;
 
@@ -100,16 +116,16 @@ void my_exemple(const char* serial_device, int baudrate)
         handle_error("cmd_mode() returns false");
     }
 
-    while(sample_counter < 1000) { // 10s
+    while(true)
+    {
         Platform::msleep(100);
+        std::cout << ("\n");
     }
 
     /*
      * 	stop communication
      */
     sensor.stop();
-
-    printf("END OF TEST(%s)\n\n", __FUNCTION__);
 }
 
 
@@ -121,9 +137,7 @@ void my_exemple(const char* serial_device, int baudrate)
 
 int main(int argc, char* argv[]) {
 
-    my_exemple(SERIAL_DEVICE, BAUDRATE);
-
+    feedback(SERIAL_DEVICE, BAUDRATE);
     return 0;
 }
-
 

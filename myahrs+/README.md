@@ -12,6 +12,5 @@
 
 * type : make all
 
-* run : ./elpimous_test_myahrs+  ( read gyro(xyz) values)
+* run : ./elpimous_test_myahrs+  ( read values)
 
-* more infos in the backup/*.cpp file
