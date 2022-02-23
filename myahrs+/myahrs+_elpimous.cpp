@@ -8,7 +8,7 @@
 
 using namespace WithRobot; // imu namespace lib
 
-static const char* SERIAL_DEVICE = "/dev/ttyACM0"; // Ylo2 USB port
+static const char* SERIAL_DEVICE = "/dev/ttyACM0"; // Ylo2 UP Xtreme  IMU USB port
 
 static const int BAUDRATE = 115200;
 
@@ -37,34 +37,35 @@ void handle_error(const char* error_msg)
 // imu variable initialization :
 // ------------------------------
 
-// float imu_feedback(10); // 11 if temperature added
-std::vector<double> imu_feedback(10);
+std::vector<double> imu_feedback(10); // 11 if temperature added
 
-
+/*
 void ex3_callback_attribute(void* context, int sensor_id, const char* attribute_name, const char* value)
 {
-    //printf(" ## sensor_id %d, Attribute has been changed(%s, %s)\n", sensor_id, attribute_name, value);
+    printf(" ## sensor_id %d, Attribute has been changed(%s, %s)\n", sensor_id, attribute_name, value);
 }
+*/
 
 void ex3_callback_data(void* context, int sensor_id, SensorData* sensor_data)
 {
-    int* counter = (int*)context;
-    (*counter)++;
-
     Quaternion& q = sensor_data->quaternion;
     ImuData<float>& imu = sensor_data->imu;
 
-    // without magnet values
-    float imu_feedback_old = (q.x, q.y, q.z, q.w, imu.ax, imu.ay, imu.az, imu.gx, imu.gy, imu.gz); 
-
+    // without magnet values, neither temp
     imu_feedback = {q.x, q.y, q.z, q.w, imu.ax, imu.ay, imu.az, imu.gx, imu.gy, imu.gz};
 
-    // with magnet values too
-    // imu_feedback = (q.x, q.y, q.z, q.w, imu.ax, imu.ay, imu.az, imu.gx, imu.gy, imu.gz, imu.mx, imu.my, imu.mz); 
+    // without magnet values, but with temp
+    //imu_feedback = {q.x, q.y, q.z, q.w, imu.ax, imu.ay, imu.az, imu.gx, imu.gy, imu.gz, imu.temperature};
+
+    // with magnet values and temp
+    // imu_feedback = (q.x, q.y, q.z, q.w, imu.ax, imu.ay, imu.az, imu.gx, imu.gy, imu.gz, imu.mx, imu.my, imu.mz, imu.temperature); 
 
     //printf("%.4f", imu_feedback_old);  // doesn't make space between values, 'cause no space in imu_feedback variable
-    printf("%.4f", imu_feedback); // testing with  a vector double of 10 elements.  Why it returns only 000 ?
+    //printf("%.4f", imu_feedback); // testing with  a vector double of 10 elements.  Why it returns only 000 ?
 
+    std::cout << (imu_feedback[9]);
+
+    // return(imu_feedback); // returns the vector[10]
 }
 
 void feedback(const char* serial_device, int baudrate)
@@ -78,7 +79,7 @@ void feedback(const char* serial_device, int baudrate)
     /*
      * 	register a callback function to attribute changed event.
      */
-    sensor.register_attribute_callback(ex3_callback_attribute, 0);
+    //sensor.register_attribute_callback(ex3_callback_attribute, 0);
 
     /*
      * 	register a callback function to new data arrived event.
@@ -116,7 +117,7 @@ void feedback(const char* serial_device, int baudrate)
         handle_error("cmd_mode() returns false");
     }
 
-    while(true)
+    while(true) // never stop ??!
     {
         Platform::msleep(100);
         std::cout << ("\n");

@@ -14,12 +14,3 @@
 
 * run : ./elpimous_test_myahrs+  ( read values)
 
-## comments :
-
-Code working :
-
-imu initializes correctly, sends quaternion, linear and angular.
-
-	can printf values when feeded in float imu_feedback(10)
-
-	only return series of 0000 when feeded in std::vector<double> imu_feedback(10)
