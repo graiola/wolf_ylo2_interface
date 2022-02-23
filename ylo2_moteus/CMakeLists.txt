@@ -14,16 +14,16 @@ endif()
 
 include_directories(include/)
 
-find_package(ament_cmake REQUIRED)
+# find_package(ament_cmake REQUIRED)
 
 file(GLOB MOTEUS_PCAN_SRC src/moteus_pcan/*.cpp)
 
 add_executable(ylo2_moteus_node src/ylo2_moteus_node.cpp ${MOTEUS_PCAN_SRC})
 target_link_libraries(ylo2_moteus_node ${CAN_LIBS})
-ament_target_dependencies(ylo2_moteus_node ) #rclcpp std_msgs sensor_msgs k3lso_msgs)
+# ament_target_dependencies(ylo2_moteus_node ) #rclcpp std_msgs sensor_msgs k3lso_msgs)
 
 install(TARGETS
 ylo2_moteus_node
   DESTINATION lib/${PROJECT_NAME})
 
-ament_package()
+# ament_package()
