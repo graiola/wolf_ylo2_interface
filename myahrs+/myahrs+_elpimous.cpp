@@ -46,7 +46,8 @@ void ex3_callback_attribute(void* context, int sensor_id, const char* attribute_
 }
 */
 
-void ex3_callback_data(void* context, int sensor_id, SensorData* sensor_data)
+// std::vector<double> callback_data(void* context, int sensor_id, SensorData* sensor_data)
+void callback_data(void* context, int sensor_id, SensorData* sensor_data)
 {
     Quaternion& q = sensor_data->quaternion;
     ImuData<float>& imu = sensor_data->imu;
@@ -63,10 +64,10 @@ void ex3_callback_data(void* context, int sensor_id, SensorData* sensor_data)
     //printf("%.4f", imu_feedback_old);  // doesn't make space between values, 'cause no space in imu_feedback variable
     //printf("%.4f", imu_feedback); // testing with  a vector double of 10 elements.  Why it returns only 000 ?
 
+    // return (imu_feedback);
     std::cout << (imu_feedback[9]);
-
-    // return(imu_feedback); // returns the vector[10]
 }
+
 
 void feedback(const char* serial_device, int baudrate)
 {
@@ -77,15 +78,20 @@ void feedback(const char* serial_device, int baudrate)
     int sample_counter = 0;
 
     /*
+     * 	register a callback function to attribute changed event.
+     */
+    //sensor.register_attribute_callback(ex3_callback_attribute, 0);
+
+    /*
      * 	register a callback function to new data arrived event.
      */
-    sensor.register_data_callback(ex3_callback_data, &sample_counter);
+    sensor.register_data_callback(callback_data, &sample_counter);
 
     /*
      * 	start communication with the myAHRS+.
      */
     if(sensor.start(serial_device, baudrate) == false) {
-        handle_error("start() returns false, check ADRESS !!!");
+        handle_error("start() returns false, check ADRESS !!! or be sure to have done : sudo chmod 666 /dev/ttyACM0");
     }
 
     /*
