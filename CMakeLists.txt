@@ -26,6 +26,8 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+add_subdirectory(ylo2_moteus)
+
 add_executable(ylo2_ros_node
     src/ylo2_robot_hw.cpp
     src/ylo2_ros_control.cpp

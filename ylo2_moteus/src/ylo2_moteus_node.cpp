@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string.h>
 #include <sstream>
+#include <list>
+#include <iostream>
 
 #include <unistd.h> // used for usleep command
 
