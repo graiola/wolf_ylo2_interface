@@ -12,5 +12,5 @@
 
 * type : make all
 
-* run : ./myahrs+_node  ( read values)
+* run : ./myahrs+_node
 
