@@ -23,10 +23,6 @@ void handle_error(const char* error_msg)
     exit(1);
 }
 
-// imu variable initialization :
-std::vector<double> imu_data(10); // 11 if temperature added
-
-
 // Read Imu datas into a vector<double>
 // Datas order : 
 //     0-3 : orientation
@@ -39,7 +35,7 @@ void callback_data(void* context, int sensor_id, SensorData* sensor_data)
     ImuData<float>& imu = sensor_data->imu;
 
     // without magnet values, neither temp
-    imu_data = {q.x, q.y, q.z, q.w, imu.ax, imu.ay, imu.az, imu.gx, imu.gy, imu.gz};
+    std::vector<double> imu_data = {q.x, q.y, q.z, q.w, imu.ax, imu.ay, imu.az, imu.gx, imu.gy, imu.gz};
 
     // return (imu_data);
     std::cout << (imu_data[9]);
