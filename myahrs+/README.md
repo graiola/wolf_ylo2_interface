@@ -12,12 +12,5 @@
 
 * type : make all
 
-* run : ./elpimous_test_myahrs+  ( read values)
+* run : ./myahrs+_node  ( read values)
 
-## comments :
-
-Code working :
-
-imu initializes correctly, sends quaternion, linear and angular.
-
-cant change : void imu_feedback(10)    to    std::vector<double> imu_feedback(10) to benefit of the return variable ?!!!

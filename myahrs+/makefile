@@ -1,7 +1,7 @@
 
 CXX = $(CROSS)g++
 
-TARGET = elpimous_test_myahrs+
+TARGET = myahrs+_node
  
 CFLAGS   = -O2
 CXXFLAGS = $(CFLAGS) -std=c++11
