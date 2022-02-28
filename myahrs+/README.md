@@ -12,5 +12,5 @@
 
 * type : make all
 
-* run : ./elpimous_test_myahrs+  ( read values)
+* run : ./myahrs+_node
 

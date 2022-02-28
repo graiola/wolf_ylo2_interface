@@ -20,3 +20,8 @@ add_executable(ylo2_moteus_node src/ylo2_moteus_node.cpp ${MOTEUS_PCAN_SRC})
 target_link_libraries(ylo2_moteus_node ${CAN_LIBS})
 
 install(TARGETS ylo2_moteus_node DESTINATION lib/${PROJECT_NAME})
+
+install(TARGETS
+ylo2_moteus_node
+  DESTINATION lib/${PROJECT_NAME})
+
