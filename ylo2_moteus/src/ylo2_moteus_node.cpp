@@ -86,7 +86,6 @@ int query()
         float pos, vel, tor;
         controller._motors[motor_id]->get_feedback(pos, vel, tor); // query values
         }
-        list commands = ;
         return (controller._motors);
     }
 

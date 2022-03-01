@@ -29,6 +29,9 @@ void handle_error(const char* error_msg)
 //     4-6 : angular_velocity
 //     7-9 : linear_acceleration
 // Return vector.
+
+//TODO 
+// std::vector<double> callback_data(void* context, int sensor_id, SensorData* sensor_data)
 void callback_data(void* context, int sensor_id, SensorData* sensor_data)
 {
     Quaternion& q = sensor_data->quaternion;
@@ -37,9 +40,9 @@ void callback_data(void* context, int sensor_id, SensorData* sensor_data)
     // without magnet values, neither temp
     std::vector<double> imu_data = {q.x, q.y, q.z, q.w, imu.ax, imu.ay, imu.az, imu.gx, imu.gy, imu.gz};
 
+    //TODO 
     // return (imu_data);
     std::cout << (imu_data[9]);
-    
 }
 
 
