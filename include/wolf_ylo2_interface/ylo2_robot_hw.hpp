@@ -21,20 +21,6 @@ public:
 
 private:
 
-  /** @brief Map ylo2 internal joint indices to WoLF joints order */
-  std::array<unsigned int, 12> ylo2_motor_idxs_
-          {{
-          ylo2hal::FL_0, ylo2hal::FL_1, ylo2hal::FL_2, // LF
-          ylo2hal::RL_0, ylo2hal::RL_1, ylo2hal::RL_2, // LH
-          ylo2hal::FR_0, ylo2hal::FR_1, ylo2hal::FR_2, // RF
-          ylo2hal::RR_0, ylo2hal::RR_1, ylo2hal::RR_2, // RH
-          }};
-
-  /** @brief ylo2-HAL */
-  ylo2hal::LowLevelInterface ylo2_interface_;
-  ylo2hal::LowState ylo2_state_ = {0};
-  ylo2hal::LowCmd ylo2_lowcmd_ = {0};
-
   /** @brief Sends a zero command to the robot */
   void send_zero_command();
 
