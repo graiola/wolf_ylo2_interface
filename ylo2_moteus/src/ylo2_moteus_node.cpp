@@ -86,8 +86,12 @@ void send_tau(int motor_id, float tor)
 int main(int argc, char **argv)
 {
 
+  //std::cout << "TEST" << std::endl;
+
   // parse the motor_id
-  int motor_id = -1;
+  //int motor_id = -1;
+  int motor_id = 99; // trying with SDK motor.
+
   if (argc == 2) {
     motor_id = stoi(argv[1]);
     std::cout << "Selected motor_id: " << motor_id << std::endl;
@@ -122,16 +126,25 @@ int main(int argc, char **argv)
 
   usleep(2000000); // sleep 2s
 
-  activate_torque_cmd(motor_id,true); // activate torque for motor 11
+  activate_torque_cmd(motor_id,true); // activate torque for motor 99
   // or perhaps easier : MoteusPcanController::set_torque_ena(true);
 
   usleep(2000000);
 
-  send_tau(motor_id,4.0); // send TAU (fftorque) order to motor 11, with a torque of 4.0
-  // or perhaps easier : MoteusPcanController::set_command(11, 4.0)
+  // not sure it will work, think i need a loop ?!
+  send_tau(motor_id,1.0); // send TAU (fftorque) order to motor 99, with a torque of 1.0 Nm
 
   usleep(2000000);
 
-  activate_torque_cmd(motor_id,false); // desactivate torque for motor 11
+  activate_torque_cmd(motor_id,false); // desactivate torque for motor 99
   // or perhaps easier : MoteusPcanController::set_torque_ena(false);
+
+  usleep(2000000);
+
+  query(motor_id, float& pos, float& vel, float& tor); // query motor 99
+  std::cout << "position value is :" << pos << std::endl;
+  std::cout << "velocity value is :" << vel << std::endl;
+  std::cout << "fftorque value is :" << tor << std::endl;
+
 }
+
