@@ -52,7 +52,7 @@ MoteusPcanMotor::MoteusPcanMotor(uint32_t id, PCANDevice* can_device_ptr)
     _comm_fftorque = 0.0;
     _comm_kp_scale = 0.0;
     _comm_kd_scale = 0.0;
-    _comm_maxtorqu = 2.0; // 10
+    _comm_maxtorqu = 2.0; // 10Nm is enough to let robot walk
 }
 
 MoteusPcanMotor::~MoteusPcanMotor(){}
@@ -127,7 +127,6 @@ bool MoteusPcanMotor::write_read(){
             print_message(msg_rx);
         #endif
         {
-            // read is of course a possibility, however it is faster to do one transaction, so write and query in same command, thanks to 0x80..hexa (ex:L20)
             std::lock_guard<std::mutex> guard(_feedback_mutex); 
             memcpy(&_position, &_rx_msg.data[MSGRX_ADDR_POSITION], sizeof(float));
             memcpy(&_velocity, &_rx_msg.data[MSGRX_ADDR_VELOCITY], sizeof(float));

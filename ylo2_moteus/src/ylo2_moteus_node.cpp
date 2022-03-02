@@ -141,10 +141,5 @@ int main(int argc, char **argv)
 
   usleep(2000000);
 
-  query(motor_id, float& pos, float& vel, float& tor); // query motor 99
-  std::cout << "position value is :" << pos << std::endl;
-  std::cout << "velocity value is :" << vel << std::endl;
-  std::cout << "fftorque value is :" << tor << std::endl;
-
 }
 
