@@ -50,13 +50,13 @@ std::vector<MotorInfo> motors_info = {
 // PEAK FDCAN PCI M2 has 4 ports and each port controls one leg (3 moteus_controllers)
 MoteusInterfaceMotorsMap interface_motors_map = {
 
-  {"PCAN_PCIBUS1", {1}}, {"PCAN_PCIBUS1", {2}}, {"PCAN_PCIBUS1", {3}},
+  {"/dev/pcanpcifd0", {1}}, {"/dev/pcanpcifd0", {2}}, {"/dev/pcanpcifd0", {3}},
 
-  {"PCAN_PCIBUS2", {4}}, {"PCAN_PCIBUS2", {5}}, {"PCAN_PCIBUS2", {6}},
+  {"/dev/pcanpcifd1", {4}}, {"/dev/pcanpcifd1", {5}}, {"/dev/pcanpcifd1", {6}},
 
-  {"PCAN_PCIBUS3", {7}}, {"PCAN_PCIBUS3", {8}}, {"PCAN_PCIBUS3", {9}},
+  {"/dev/pcanpcifd2", {7}}, {"/dev/pcanpcifd2", {8}}, {"/dev/pcanpcifd2", {9}},
 
-  {"PCAN_PCIBUS4", {10}}, {"PCAN_PCIBUS4", {11}}, {"PCAN_PCIBUS4", {12}}
+  {"/dev/pcanpcifd3", {10}}, {"/dev/pcanpcifd3", {11}}, {"/dev/pcanpcifd3", {12}}
 };
 
 MoteusPcanController controller(interface_motors_map);
