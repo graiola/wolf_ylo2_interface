@@ -61,7 +61,6 @@ MoteusInterfaceMotorsMap interface_motors_map = {
 
 MoteusPcanController controller(interface_motors_map);
 
-/*
 // torque switch on/off, and target ID 
 void activate_torque_cmd(int motor_id, bool activate)
 {
@@ -82,7 +81,7 @@ void send_tau(int motor_id, float tor)
 {
   controller._motors[motor_id]->set_commands(tor);
 }
-*/
+
 
 int main(int argc, char **argv)
 {
