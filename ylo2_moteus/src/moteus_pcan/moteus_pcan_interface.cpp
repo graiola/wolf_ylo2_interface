@@ -16,6 +16,7 @@ MoteusPcanInterface::MoteusPcanInterface(const std::string& interface, const std
     _can_config.mode_fd = 1; // FD Mode
 #ifdef USE_PCAN
     // Open CAN
+    std::cout << "opening pcan port : " << interface  << std::endl;
     if(!_can_device.Open(interface, _can_config, false))
     {
         return;
@@ -24,6 +25,7 @@ MoteusPcanInterface::MoteusPcanInterface(const std::string& interface, const std
 #endif
     // Motors
     for(const auto& id: ids){
+        std::cout << "initializing pcan port, from ID : " << id  << std::endl;
         _motors[id] = std::make_shared<MoteusPcanMotor>(id, &_can_device);
     }
     // Everything ok
@@ -34,11 +36,13 @@ MoteusPcanInterface::MoteusPcanInterface(const std::string& interface, const std
 MoteusPcanInterface::~MoteusPcanInterface(){}
 
 bool MoteusPcanInterface::is_initialized(){
+    std::cout << "MoteusPcanInterface::is_initialized()" << std::endl;
     return _initialized;
 }
 
 bool MoteusPcanInterface::is_running(){
     std::lock_guard<std::mutex> guard(_running_mutex);
+    std::cout << "MoteusPcanInterface::is_running()" << std::endl;
     return _running;
 }
 
@@ -54,6 +58,7 @@ void MoteusPcanInterface::start(){
 }
 
 void MoteusPcanInterface::loop(){
+    std::cout << "testing MoteusPcanInterface::loop()" << std::endl;
     while(true){
         for(const auto& [id, motor]: _motors){
             if(!motor->write_read()){
@@ -74,7 +79,7 @@ void MoteusPcanInterface::loop(){
         }
         {
             std::lock_guard<std::mutex> guard(_running_mutex);
-            if(!_running){
+            if(!_running){ 
                 break;
             }
         }
@@ -86,6 +91,7 @@ void MoteusPcanInterface::loop(){
 }
 
 void MoteusPcanInterface::status_loop(){
+    std::cout << "testing MoteusPcanInterface::status_loop()" << std::endl;
     while(true){
         for(int i=0; i<10; i++){
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -102,6 +108,7 @@ void MoteusPcanInterface::status_loop(){
 }
 
 void MoteusPcanInterface::stop(){
+    std::cout << "testing MoteusPcanInterface::stop()" << std::endl;
     {
         std::lock_guard<std::mutex> guard(_running_mutex);
         _running = false;
