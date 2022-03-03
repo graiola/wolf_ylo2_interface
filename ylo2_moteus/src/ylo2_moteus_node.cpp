@@ -26,24 +26,24 @@ std::vector<MotorInfo> motors_info = {
   // TODO : joint_names aren't used for now.
   // is my can_interface call correct ?
 
-  {"lf_haa_joint",    "PCAN_PCIBUS1",    1,      0.00,     true},
-  {"lf_hfe_joint",    "PCAN_PCIBUS1",    2,      0.00,     true},
-  {"lf_kfe_joint",    "PCAN_PCIBUS1",    3,      0.00,     true},
+  {"lf_haa_joint",    "/dev/pcanpcifd0",    1,      0.00,     true},
+  {"lf_hfe_joint",    "/dev/pcanpcifd0",    2,      0.00,     true},
+  {"lf_kfe_joint",    "/dev/pcanpcifd0",    3,      0.00,     true},
 
   // rf_leg
-  {"rf_haa_joint",    "PCAN_PCIBUS2",    4,      0.00,     true},
-  {"rf_hfe_joint",    "PCAN_PCIBUS2",    5,      0.00,     true},
-  {"rf_kfe_joint",    "PCAN_PCIBUS2",    6,      0.00,     true},
+  {"rf_haa_joint",    "/dev/pcanpcifd1",    4,      0.00,     true},
+  {"rf_hfe_joint",    "/dev/pcanpcifd1",    5,      0.00,     true},
+  {"rf_kfe_joint",    "/dev/pcanpcifd1",    6,      0.00,     true},
 
   // lh_leg
-  {"lh_haa_joint",    "PCAN_PCIBUS3",    7,      0.00,     true},
-  {"lh_hfe_joint",    "PCAN_PCIBUS3",    8,      0.00,     true},
-  {"lh_kfe_joint",    "PCAN_PCIBUS3",    9,      0.00,     true},
+  {"lh_haa_joint",    "/dev/pcanpcifd2",    7,      0.00,     true},
+  {"lh_hfe_joint",    "/dev/pcanpcifd2",    8,      0.00,     true},
+  {"lh_kfe_joint",    "/dev/pcanpcifd2",    9,      0.00,     true},
 
   // rh_leg
-  {"rh_haa_joint",    "PCAN_PCIBUS4",   10,      0.00,     true},
-  {"rh_hfe_joint",    "PCAN_PCIBUS4",   11,      0.00,     true},
-  {"rh_kfe_joint",    "PCAN_PCIBUS4",   12,      0.00,     true}
+  {"rh_haa_joint",    "/dev/pcanpcifd3",   10,      0.00,     true},
+  {"rh_hfe_joint",    "/dev/pcanpcifd3",   11,      0.00,     true},
+  {"rh_kfe_joint",    "/dev/pcanpcifd3",   12,      0.00,     true}
 };
 
 
