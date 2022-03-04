@@ -27,10 +27,6 @@ MoteusPcanController::MoteusPcanController(const MoteusInterfaceMotorsMap& inter
 }
 
 MoteusPcanController::~MoteusPcanController(){
-    for(const auto& interface: _interfaces){
-        interface->stop();
-    }
-    std::cout << "Motors stopped" << std::endl;
 }
 
 bool MoteusPcanController::is_initialized(){
@@ -42,6 +38,14 @@ void MoteusPcanController::start(){
     for(const auto& interface: _interfaces){
         interface->start();
     }
+}
+
+void MoteusPcanController::stop()
+{
+  for(const auto& interface: _interfaces){
+      interface->stop();
+  }
+  std::cout << "Motors stopped" << std::endl;
 }
 
 bool MoteusPcanController::set_torque_ena(bool torque_ena){

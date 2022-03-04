@@ -7,6 +7,8 @@
 
 #include "moteus_pcan/moteus_pcan_controller.h"
 
+MoteusPcanController::Ptr _controller;
+
 using namespace std;
 
 struct MotorInfo{
@@ -17,8 +19,7 @@ struct MotorInfo{
   bool invert;
 };
 
-
-std::vector<MotorInfo> motors_info = {
+static std::vector<MotorInfo> _motors_info = {
 
   // joint_name;      can_interface;   can_id;   offset;   invert;
   // lf_leg
@@ -48,7 +49,7 @@ std::vector<MotorInfo> motors_info = {
 
 
 // PEAK FDCAN PCI M2 has 4 ports and each port controls one leg (3 moteus_controllers)
-MoteusInterfaceMotorsMap interface_motors_map = {
+static MoteusInterfaceMotorsMap _interface_motors_map = {
 
   {"/dev/pcanpcifd0", {1}}, {"/dev/pcanpcifd0", {2}}, {"/dev/pcanpcifd0", {3}},
 
@@ -59,36 +60,36 @@ MoteusInterfaceMotorsMap interface_motors_map = {
   {"/dev/pcanpcifd3", {10}}, {"/dev/pcanpcifd3", {11}}, {"/dev/pcanpcifd3", {12}}
 };
 
-MoteusPcanController controller(interface_motors_map);
-
 // torque switch on/off, and target ID 
 void activate_torque_cmd(int motor_id, bool activate)
 {
   // send pcan order, using correct port (ex:PCAN_PCIBUS1), target id, and state
   // TODO : controller._motors[moteus_id] calls the target id, and it specific can_port ??
-  controller._motors[motor_id]->set_torque_ena(activate);
+  _controller->_motors[motor_id]->set_torque_ena(activate);
   std::cout << "activated torque cmd for motor_id: " << motor_id << std::endl;
 }
 
 // query position, velocity, and torque, for all 12 motors in order (1-12)
 void query(int motor_id, float& pos, float& vel, float& tor)
 {
-  controller._motors[motor_id]->get_feedback(pos, vel, tor); // query values
+  _controller->_motors[motor_id]->get_feedback(pos, vel, tor); // query values
 }
 
 // send fftorque order to specific id, with specific torque
 void send_tau(int motor_id, float tor)
 {
-  controller._motors[motor_id]->set_commands(tor);
+  _controller->_motors[motor_id]->set_commands(tor);
 }
 
 
 int main(int argc, char **argv)
 {
 
+  _controller = std::make_shared<MoteusPcanController>(_interface_motors_map);
+
   std::cout << "TEST" << std::endl;
   
-  /*
+
   // parse the motor_id
   //int motor_id = -1;
   int motor_id = 99; // trying with SDK motor.
@@ -108,16 +109,16 @@ int main(int argc, char **argv)
   // Opens all ports present in interface_motors_map ?
   // pass initialization if port already open ? (ex: i have 3 times same port !)
   // graiola: Can we initialize a single motor to test it? Do we have to initialize all of them?
-  if(!controller.is_initialized()){
+  if(!_controller->is_initialized()){
     std::cerr << "Could not initialize Moteus controllers." << std::endl;
     return 1;
   }
 
   // start all 12 moteus controllers
-  controller.start();
+  _controller->start();
 
   // check if all 12 moteus controllers are running
-  if(!controller.all_running())
+  if(!_controller->all_running())
   {
     std::cerr << "One or more Moteus controllers are not running." << std::endl;
     return 1;
@@ -141,6 +142,9 @@ int main(int argc, char **argv)
   // or perhaps easier : MoteusPcanController::set_torque_ena(false);
 
   usleep(2000000);
-  */
+
+
+  _controller->stop();
+
 }
 

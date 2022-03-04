@@ -14,10 +14,14 @@ typedef std::map<std::string, std::vector<int>> MoteusInterfaceMotorsMap;
 
 class MoteusPcanController{
 public:
+
+    typedef std::shared_ptr<MoteusPcanController> Ptr;
+
     MoteusPcanController(const MoteusInterfaceMotorsMap& interface_motors_map);
     ~MoteusPcanController();
     bool is_initialized();
     void start();
+    void stop();
     bool all_running();
 
     bool set_torque_ena(bool torque_ena);

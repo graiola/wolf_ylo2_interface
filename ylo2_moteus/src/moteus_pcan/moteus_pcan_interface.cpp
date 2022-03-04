@@ -25,7 +25,6 @@ MoteusPcanInterface::MoteusPcanInterface(const std::string& interface, const std
 #endif
     // Motors
     for(const auto& id: ids){
-        std::cout << "initializing pcan port, from ID : " << id  << std::endl;
         _motors[id] = std::make_shared<MoteusPcanMotor>(id, &_can_device);
     }
     // Everything ok
@@ -36,13 +35,13 @@ MoteusPcanInterface::MoteusPcanInterface(const std::string& interface, const std
 MoteusPcanInterface::~MoteusPcanInterface(){}
 
 bool MoteusPcanInterface::is_initialized(){
-    std::cout << "MoteusPcanInterface::is_initialized()" << std::endl;
+    //std::cout << "MoteusPcanInterface::is_initialized()" << std::endl;
     return _initialized;
 }
 
 bool MoteusPcanInterface::is_running(){
     std::lock_guard<std::mutex> guard(_running_mutex);
-    std::cout << "MoteusPcanInterface::is_running()" << std::endl;
+    //std::cout << "MoteusPcanInterface::is_running()" << std::endl;
     return _running;
 }
 
@@ -58,7 +57,7 @@ void MoteusPcanInterface::start(){
 }
 
 void MoteusPcanInterface::loop(){
-    std::cout << "testing MoteusPcanInterface::loop()" << std::endl;
+    //std::cout << "testing MoteusPcanInterface::loop()" << std::endl;
     while(true){
         for(const auto& [id, motor]: _motors){
             if(!motor->write_read()){
@@ -91,7 +90,7 @@ void MoteusPcanInterface::loop(){
 }
 
 void MoteusPcanInterface::status_loop(){
-    std::cout << "testing MoteusPcanInterface::status_loop()" << std::endl;
+    //std::cout << "testing MoteusPcanInterface::status_loop()" << std::endl;
     while(true){
         for(int i=0; i<10; i++){
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -108,7 +107,7 @@ void MoteusPcanInterface::status_loop(){
 }
 
 void MoteusPcanInterface::stop(){
-    std::cout << "testing MoteusPcanInterface::stop()" << std::endl;
+    //std::cout << "testing MoteusPcanInterface::stop()" << std::endl;
     {
         std::lock_guard<std::mutex> guard(_running_mutex);
         _running = false;
