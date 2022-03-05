@@ -27,6 +27,8 @@ static std::vector<MotorInfo> _motors_info = {
   // TODO : joint_names aren't used for now.
   // is my can_interface call correct ?
 
+  {"lf_hfe_joint",    "/dev/pcanpcifd0",    2,      0.00,     true}
+  /*
   {"lf_haa_joint",    "/dev/pcanpcifd0",    1,      0.00,     true},
   {"lf_hfe_joint",    "/dev/pcanpcifd0",    2,      0.00,     true},
   {"lf_kfe_joint",    "/dev/pcanpcifd0",    3,      0.00,     true},
@@ -45,12 +47,15 @@ static std::vector<MotorInfo> _motors_info = {
   {"rh_haa_joint",    "/dev/pcanpcifd3",   10,      0.00,     true},
   {"rh_hfe_joint",    "/dev/pcanpcifd3",   11,      0.00,     true},
   {"rh_kfe_joint",    "/dev/pcanpcifd3",   12,      0.00,     true}
+  */
 };
 
 
 // PEAK FDCAN PCI M2 has 4 ports and each port controls one leg (3 moteus_controllers)
 static MoteusInterfaceMotorsMap _interface_motors_map = {
 
+  {"/dev/pcanpcifd0", {2}}
+  /*
   {"/dev/pcanpcifd0", {1}}, {"/dev/pcanpcifd0", {2}}, {"/dev/pcanpcifd0", {3}},
 
   {"/dev/pcanpcifd1", {4}}, {"/dev/pcanpcifd1", {5}}, {"/dev/pcanpcifd1", {6}},
@@ -58,6 +63,7 @@ static MoteusInterfaceMotorsMap _interface_motors_map = {
   {"/dev/pcanpcifd2", {7}}, {"/dev/pcanpcifd2", {8}}, {"/dev/pcanpcifd2", {9}},
 
   {"/dev/pcanpcifd3", {10}}, {"/dev/pcanpcifd3", {11}}, {"/dev/pcanpcifd3", {12}}
+  */
 };
 
 // torque switch on/off, and target ID 
@@ -92,25 +98,27 @@ int main(int argc, char **argv)
 
   // parse the motor_id
   //int motor_id = -1;
-  int motor_id = 99; // trying with SDK motor.
+  int motor_id = 2; // trying with SDK motor.
 
   if (argc == 2) {
     motor_id = stoi(argv[1]);
     std::cout << "Selected motor_id: " << motor_id << std::endl;
   }
+
   else {
     // graiola: in case we have motor_id=-1, we could activate all of them instead
     // of throwing an error.
     std::cerr << "Usage: " << argv[0] << " motor_id" << std::endl;
-    return 1;
+    return 1; // quit main()
   }
+  
 
   // initializing all 12 moteus controllers.
   // Opens all ports present in interface_motors_map ?
   // pass initialization if port already open ? (ex: i have 3 times same port !)
   // graiola: Can we initialize a single motor to test it? Do we have to initialize all of them?
   if(!_controller->is_initialized()){
-    std::cerr << "Could not initialize Moteus controllers." << std::endl;
+    std::cerr << "controller->is_initialized()" << std::endl;
     return 1;
   }
 
@@ -131,20 +139,20 @@ int main(int argc, char **argv)
   activate_torque_cmd(motor_id,true); // activate torque for motor 99
   // or perhaps easier : MoteusPcanController::set_torque_ena(true);
 
-  usleep(2000000);
+  // usleep(5000000);
 
   // not sure it will work, think i need a loop ?!
-  send_tau(motor_id,1.0); // send TAU (fftorque) order to motor 99, with a torque of 1.0 Nm
+  // send_tau(motor_id,1.0); // send TAU (fftorque) order to motor 99, with a torque of 1.0 Nm
 
-  usleep(2000000);
+  // usleep(2000000);
 
-  activate_torque_cmd(motor_id,false); // desactivate torque for motor 99
+  // activate_torque_cmd(motor_id,false); // desactivate torque for motor 99
   // or perhaps easier : MoteusPcanController::set_torque_ena(false);
 
-  usleep(2000000);
+  // usleep(2000000);
 
 
-  _controller->stop();
+  //_controller->stop();
 
 }
 
