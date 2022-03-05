@@ -52,7 +52,7 @@ MoteusPcanMotor::MoteusPcanMotor(uint32_t id, PCANDevice* can_device_ptr)
     _comm_fftorque = 0.0;
     _comm_kp_scale = 0.0;
     _comm_kd_scale = 0.0;
-    _comm_maxtorqu = 2.0; // 10Nm is enough to let robot walk
+    _comm_maxtorqu = 2.0; // 10
 }
 
 MoteusPcanMotor::~MoteusPcanMotor(){}

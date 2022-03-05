@@ -20,17 +20,18 @@ MoteusPcanController::MoteusPcanController(const MoteusInterfaceMotorsMap& inter
                 return;
             }
         }
-    } 
+    }
     _initialized = true;
-    std::cout << "All ports correctly activated !" << std::endl;
     return;
 }
 
 MoteusPcanController::~MoteusPcanController(){
+    for(const auto& interface: _interfaces){
+        interface->stop();
+    }
 }
 
 bool MoteusPcanController::is_initialized(){
-    std::cout << "Motors initialized and stopped !" << std::endl;
     return _initialized;
 }
 
@@ -38,14 +39,6 @@ void MoteusPcanController::start(){
     for(const auto& interface: _interfaces){
         interface->start();
     }
-}
-
-void MoteusPcanController::stop()
-{
-  for(const auto& interface: _interfaces){
-      interface->stop();
-  }
-  std::cout << "Motors stopped" << std::endl;
 }
 
 bool MoteusPcanController::set_torque_ena(bool torque_ena){
