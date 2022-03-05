@@ -97,8 +97,7 @@ int main(int argc, char **argv)
   
 
   // parse the motor_id
-  //int motor_id = -1;
-  int motor_id = 2; // trying with SDK motor.
+  int motor_id = -1;
 
   if (argc == 2) {
     motor_id = stoi(argv[1]);
@@ -136,18 +135,15 @@ int main(int argc, char **argv)
 
   usleep(2000000); // sleep 2s
 
-  activate_torque_cmd(motor_id,true); // activate torque for motor 99
-  // or perhaps easier : MoteusPcanController::set_torque_ena(true);
+  activate_torque_cmd(motor_id,true); // activate torque
 
   // usleep(5000000);
 
-  // not sure it will work, think i need a loop ?!
-  // send_tau(motor_id,1.0); // send TAU (fftorque) order to motor 99, with a torque of 1.0 Nm
+  // send_tau(motor_id,1.0); // send TAU (fftorque) order to moteus controller with a torque of 1.0 Nm
 
   // usleep(2000000);
 
-  // activate_torque_cmd(motor_id,false); // desactivate torque for motor 99
-  // or perhaps easier : MoteusPcanController::set_torque_ena(false);
+  // activate_torque_cmd(motor_id,false);
 
   // usleep(2000000);
 
