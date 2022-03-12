@@ -17,24 +17,13 @@ struct MotorInfo{
   bool invert;
 };
 
-
-std::vector<MotorInfo> motors_info = {
-
-  // joint_name;      can_interface;   can_id;   offset;   invert;
-  // lf_leg
-
-  // TODO : joint_names aren't used for now.
-  // is my can_interface call correct ?
-
-  
-  {"lf_hfe_joint",    "/dev/pcanpcifd0",    2,      0.00,     true}
-};
-
-
 // PEAK FDCAN PCI M2 has 4 ports and each port controls one leg (3 moteus_controllers)
 MoteusInterfaceMotorsMap interface_motors_map = {
-
-  {"/dev/pcanpcifd0", {2}}
+  
+  {"/dev/pcanpcifd0", {1,2,3}},
+  {"/dev/pcanpcifd1", {4,5,6,99}},
+  {"/dev/pcanpcifd2", {7,8,9}},
+  {"/dev/pcanpcifd3", {10,11,12}}
 };
 
 MoteusPcanController controller(interface_motors_map);
