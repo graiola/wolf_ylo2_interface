@@ -5,6 +5,7 @@
 #include <thread>
 #include <vector>
 #include <map>
+#include <atomic>
 
 #include "moteus_pcan/PCANDevice.h"
 #include "moteus_pcan/definitions.h"
@@ -25,16 +26,14 @@ public:
     int _freq;
 private:
     bool _initialized;
-    bool _running;
+    std::atomic<bool> _running;
     int _fail_count;
-    std::mutex _running_mutex;
     std::string _interface;
     PCANDevice _can_device;
     CANDevice::Config_t _can_config;
     std::shared_ptr<std::thread> _loop_thread;
     std::shared_ptr<std::thread> _status_loop_thread;
-    int _freq_counter;
-    std::mutex _freq_counter_mutex;
+    std::atomic<int> _freq_counter;
 
     void loop();
     void status_loop();
