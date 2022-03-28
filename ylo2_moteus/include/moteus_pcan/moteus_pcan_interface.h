@@ -31,7 +31,8 @@ private:
     std::string _interface;
     PCANDevice _can_device;
     CANDevice::Config_t _can_config;
-    std::shared_ptr<std::thread> _loop_thread;
+    // std::share_ptr : c'est un pointeur intelligent qui conserve la propriété partagée d'un objet via un pointeur.
+    std::shared_ptr<std::thread> _loop_thread; 
     std::shared_ptr<std::thread> _status_loop_thread;
     std::atomic<int> _freq_counter;
 

@@ -31,28 +31,29 @@ MoteusPcanMotor::MoteusPcanMotor(uint32_t id, PCANDevice* can_device_ptr)
 
     // TX POS PACKAGE for Tau mode only (torque, kp=0, kd=0)
     _tx_msg.id = 0x8000 | id;
-    _tx_msg.length = 32;  // TODO: less bytes ?
+    _tx_msg.length = 12;  // TODO: less bytes ?
     // Write Mode
     _tx_msg.data[0] = 0x01; // Write uint8 (0x00) | Write 1 register (0x01)
     _tx_msg.data[1] = 0x00; // Register to write: MODE
     _tx_msg.data[2] = 0x0A; // Value to write: POSITION MODE
     // Write command
     _tx_msg.data[3] = 0x0C; // Write floats
-    _tx_msg.data[4] = 0x01; // Write 3 registers
-    _tx_msg.data[5] = 0x22; // Starting register: fftorqueCOMM
+    _tx_msg.data[4] = 0x01; // 0x01 Write 3 registers
+    _tx_msg.data[5] = 0x22; // 0x22 Starting register: fftorqueCOMM
+    // _tx_msg.data[6 to 9] are for the float fftorqueCOMM
     // Query
-    _tx_msg.data[30] = 0x1F; // Read floats (0x1C) | Read 3 registers (0x03)
-    _tx_msg.data[31] = 0x01; // Starting register: POSITION, VELOCITY, TORQUE
+    _tx_msg.data[10] = 0x1F; // Read floats (0x1C) | Read 3 registers (0x03)
+    _tx_msg.data[11] = 0x01; // Starting register: POSITION, VELOCITY, TORQUE
     
     // -----------------------------------------------------------------------------
 
     // Initial values
     _comm_position = 0.0;
     _comm_velocity = 0.0;
-    _comm_fftorque = 0.0;
+    _comm_fftorque = 0.5;
     _comm_kp_scale = 0.0;
     _comm_kd_scale = 0.0;
-    _comm_maxtorqu = 2.0; // 10
+    _comm_maxtorqu = 1.0; // 10
 }
 
 MoteusPcanMotor::~MoteusPcanMotor(){}
@@ -69,7 +70,7 @@ void MoteusPcanMotor::get_feedback(float& position, float& velocity, float& torq
     torque = _torque;
 }
 
-void MoteusPcanMotor::set_torque_ena(bool torque_ena){
+void MoteusPcanMotor::set_torque_ena(bool torque_ena){ // fonctionne nickel
     std::lock_guard<std::mutex> guard(_torque_ena_mutex);
     if(!torque_ena){ // DISABLE torque
         std::cout << "Motor " << _id << ", torque disabled" << std::endl;
@@ -79,13 +80,14 @@ void MoteusPcanMotor::set_torque_ena(bool torque_ena){
         if(!_torque_ena){ // Torque is disabled before changing
             std::lock_guard<std::mutex> guard1(_command_mutex);
             std::lock_guard<std::mutex> guard2(_feedback_mutex);
-            _comm_position = _position;
+            //_comm_position = _position;
+            _comm_position = 0.0;
             _torque_ena = true;
         }
     }
 }
 
-bool MoteusPcanMotor::write_read(){
+bool MoteusPcanMotor::write_read(){ // fonctionne nickel
     bool toque_local;
     {
         std::lock_guard<std::mutex> guard(_torque_ena_mutex);

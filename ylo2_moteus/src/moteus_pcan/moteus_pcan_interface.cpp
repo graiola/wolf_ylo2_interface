@@ -95,6 +95,6 @@ void MoteusPcanInterface::status_loop(){
 
 void MoteusPcanInterface::stop(){
   _running = false;
-  if (_loop_thread) _loop_thread->join();
+  if (_loop_thread) _loop_thread->join(); // pauses until it finishes
   if (_status_loop_thread) _status_loop_thread->join();
 }

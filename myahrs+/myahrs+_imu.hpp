@@ -17,6 +17,9 @@ static const int BAUDRATE = 115200;
 
 static const char* DIVIDER = "1";  // 100 Hz
 
+std::vector<double> imu_data(10);
+std::vector<double> &_imu_data(imu_data);
+
 void handle_error(const char* error_msg)
 {
     fprintf(stderr, "ERROR: %s\n", error_msg);
@@ -30,23 +33,17 @@ void handle_error(const char* error_msg)
 //     7-9 : linear_acceleration
 // Return vector.
 
-//TODO 
-// std::vector<double> callback_data(void* context, int sensor_id, SensorData* sensor_data)
 void callback_data(void* context, int sensor_id, SensorData* sensor_data)
 {
     Quaternion& q = sensor_data->quaternion;
     ImuData<float>& imu = sensor_data->imu;
 
     // without magnet values, neither temp
-    std::vector<double> imu_data = {q.x, q.y, q.z, q.w, imu.ax, imu.ay, imu.az, imu.gx, imu.gy, imu.gz};
-
-    //TODO 
-    // return (imu_data);
-    std::cout << (imu_data[9]);
+    _imu_data = {q.x, q.y, q.z, q.w, imu.ax, imu.ay, imu.az, imu.gx, imu.gy, imu.gz};
 }
 
 
-void Imu_data(const char* serial_device, int baudrate)
+void Imu_Data(const char* serial_device, int baudrate)
 {
     //printf("\nSTARTING IMU FEEDBACK...\n");
     MyAhrsPlus sensor;
@@ -82,10 +79,10 @@ void Imu_data(const char* serial_device, int baudrate)
         handle_error("cmd_mode() returns false");
     }
 
-    while(true) // never stop ??!
-    {
-        Platform::msleep(100);
-    }
+    //while(true) // never stop ??!
+    //{
+    //    Platform::msleep(100);
+    //}
 
     // stop communication
     sensor.stop();

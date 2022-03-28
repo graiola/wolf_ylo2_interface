@@ -67,10 +67,6 @@ void ylo2RobotHw::init()
 void ylo2RobotHw::read()
 {
     // Get robot data
-    //ylo2_state_ = ylo2_interface_.ReceiveObservation();
-    // replace each ylo2_interface_. to moteus ones
-    //TODO fonction read
-
     // ------
     // Joints
     // ------
@@ -79,11 +75,18 @@ void ylo2RobotHw::read()
         joint_position_[jj] = 0.0;
         joint_velocity_[jj] = 0.0;
         joint_effort_[jj]   = 0.0;
+
+        // read real values of moteus motors
+        //query(jj+1, pos, vel, tor);
+        //joint_position_[jj] = pos;
+        //joint_velocity_[jj] = vel;
+        //joint_effort_[jj]   = tor;
     }
 
     // ---
     // IMU
     // ---
+
     imu_orientation_[0] = 0.0;  // w
     imu_orientation_[1] = 0.0;  // x
     imu_orientation_[2] = 0.0;  // y
@@ -96,21 +99,35 @@ void ylo2RobotHw::read()
     imu_lin_acc_[0] = 0.0;
     imu_lin_acc_[1] = 0.0;
     imu_lin_acc_[2] = 0.0;
+
+    /*
+    Imu_Data(SERIAL_DEVICE, BAUDRATE); // feed the reference variable _imu_data
+    imu_orientation_[0] = _imu_data[0];
+    imu_orientation_[1] = _imu_data[1];
+    imu_orientation_[2] = _imu_data[2];
+    imu_orientation_[3] = _imu_data[3];
+    imu_ang_vel_[0] = _imu_data[4];
+    imu_ang_vel_[1] = _imu_data[5];
+    imu_ang_vel_[2] = _imu_data[6];
+    imu_lin_acc_[0] = _imu_data[7];
+    imu_lin_acc_[1] = _imu_data[8];
+    imu_lin_acc_[2] = _imu_data[9];
+    */
 }
 
 void ylo2RobotHw::write()
 {
     //for (unsigned int jj = 0; jj < n_dof_; ++jj)
-      //ylo2_lowcmd_.motorCmd[ylo2_motor_idxs_[jj]].tau = static_cast<float>(joint_effort_command_[jj]  );
+    //ylo2_lowcmd_.motorCmd[ylo2_motor_idxs_[jj]].tau = static_cast<float>(joint_effort_command_[jj]  );
 
-    //ylo2_interface_.SendLowCmd(ylo2_lowcmd_);
-    // replace each ylo2_interface_. to moteus ones
-    //TODO fonction send fftorque
+    // write real torque value to moteus motors
+    //for (unsigned int jj = 0; jj < n_dof_; ++jj)
+    //  send_tau(jj+1, static_cast<float>(joint_effort_command_[jj]));
 }
 
 void ylo2RobotHw::send_zero_command()
 {
-    std::array<float, 60> zero_command = {0};
+    //std::array<float, 60> zero_command = {0};
     // ylo2_interface_->SendCommand(zero_command); is equal to  // ylo2_interface_.SendCommand(zero_command); but for pointer
     // replace each ylo2_interface_. to moteus ones
     //TODO fonction zeroing_command

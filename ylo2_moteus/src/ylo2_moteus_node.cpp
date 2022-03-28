@@ -9,21 +9,18 @@
 
 using namespace std;
 
-struct MotorInfo{
-  std::string joint_name;
-  std::string can_interface;
-  int can_id;
-  double offset;
-  bool invert;
-};
+std::vector<float> unique_feedback(3); // one vector per motor (pos, vel, tor)
+std::vector<float> &_unique_feedback(unique_feedback); // reference
+std::vector<vector<float>> global_feedback{}; // one vector for all motors, containing the 12 individual vectors
+std::vector<vector<float>> &_global_feedback(global_feedback); // reference
 
 // PEAK FDCAN PCI M2 has 4 ports and each port controls one leg (3 moteus_controllers)
 MoteusInterfaceMotorsMap interface_motors_map = {
   
-  {"/dev/pcanpcifd0", {1,2,3}},
-  {"/dev/pcanpcifd1", {4,5,6,99}},
-  {"/dev/pcanpcifd2", {7,8,9}},
-  {"/dev/pcanpcifd3", {10,11,12}}
+  {"/dev/pcanpcifd0", {1,2,3,}},
+  {"/dev/pcanpcifd1", {4,5,6,}},
+  {"/dev/pcanpcifd2", {7,8,9,}},
+  {"/dev/pcanpcifd3", {10,11,12,}},
 };
 
 MoteusPcanController controller(interface_motors_map);
@@ -33,7 +30,6 @@ MoteusPcanController controller(interface_motors_map);
 void activate_torque_cmd(int motor_id, bool activate)
 {
   // send pcan order, using correct port (ex:PCAN_PCIBUS1), target id, and state
-  // TODO : controller._motors[moteus_id] calls the target id, and it specific can_port ??
   controller._motors[motor_id]->set_torque_ena(activate);
 }
 
@@ -43,69 +39,69 @@ void query(int motor_id, float& pos, float& vel, float& tor)
   controller._motors[motor_id]->get_feedback(pos, vel, tor); // query values
 }
 
+// build a vector(12) with the return of all 12 motors
+std::vector<vector<float>> global_query(float& pos, float& vel, float& tor)
+{
+  for (unsigned int i=1; i<13; i++)
+  {
+    controller._motors[i]->get_feedback(pos, vel, tor); // query each motor in the range 1-12
+    _unique_feedback[0] = pos;
+    _unique_feedback[1] = vel;
+    _unique_feedback[2] = tor;
+    _global_feedback.push_back(_unique_feedback); // insert actual vector in the global vector
+  }
+  return _global_feedback; // return the global vector, containing all queries for the 12 motors, in order 1-12, and pos,vel,tor in each
+  // global_feedback = {{pos, vel, tor}, {pos, vel, tor}, {pos, vel, tor}...}
+}
+
 // send fftorque order to specific id, with specific torque
 void send_tau(int motor_id, float tor)
 {
   controller._motors[motor_id]->set_commands(tor);
 }
 
-int main(int argc, char **argv)
+
+int main()
 {
 
   float pos, vel, tor;
 
-  // parse the motor_id
-  int motor_id = -1;
-  if (argc == 2) {
-    motor_id = stoi(argv[1]);
-    std::cout << "Selected motor_id: " << motor_id << std::endl;
-  }
-  else {
-    // graiola: in case we have motor_id=-1, we could activate all of them instead
-    // of throwing an error.
-    std::cerr << "Usage: " << argv[0] << " motor_id" << std::endl;
-    return 1;
-  }
-
-  // initializing all 12 moteus controllers.
-  // Opens all ports present in interface_motors_map ?
-  // pass initialization if port already open ? (ex: i have 3 times same port !)
-  // graiola: Can we initialize a single motor to test it? Do we have to initialize all of them?
   if(!controller.is_initialized()){
     std::cerr << "Could not initialize Moteus controllers." << std::endl;
     return 1;
   }
 
-  // start all 12 moteus controllers
+  // start all 12 moteus controllers, and check them
   controller.start();
-
-  // check if all 12 moteus controllers are running
   if(!controller.all_running())
   {
     std::cerr << "One or more Moteus controllers are not running." << std::endl;
     return 1;
   }
 
-  std::cout << "Motors are running !!!" << std::endl;
+  //std::cout << "Motors are running !!!" << std::endl;
 
-  activate_torque_cmd(motor_id,true); // activate torque for motor 11
-  // or perhaps easier : MoteusPcanController::set_torque_ena(true);
+  usleep(1000); // need to select a correct usleep delay, otherwise, rx queue will not be fully feeded !
 
-  usleep(5000000);
+  /*
+  while(true)
+  {
+  std::vector<vector<float>> read = global_query(pos, vel, tor); // query all 12 motors
 
-  //send_tau(motor_id,0.2);
-  controller._motors[motor_id]->set_commands(0.2);
-  usleep(2000);
+  // Displaying the 2D vector
+  for (int i = 0; i < 12; i++)
+  {
+        for (auto it = read[i].begin(); it != read[i].end(); it++)
+            cout << *it << " ";
+        cout << endl;
+  }
+  usleep(1);
+  }
+  */
 
-  controller._motors[motor_id]->get_feedback(pos, vel, tor);
+  query(8, pos, vel, tor);
   std::cout << "Position : " << pos << std::endl;
   std::cout << "velocity : " << vel << std::endl;
   std::cout << "torque : " << tor << std::endl;
-  
-  usleep(2000);
 
-
-  activate_torque_cmd(motor_id,false); // desactivate torque for motor 11
-  usleep(2000);
-  // or perhaps easier : MoteusPcanController::set_torque_ena(false);
 }
