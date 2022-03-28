@@ -1,7 +1,7 @@
 #ifndef ylo2_ROBOT_HW_H
 #define ylo2_ROBOT_HW_H
 
-#include <wolf_ylo2_interface/wolf_robot_hw.h>
+#include <wolf_hardware_interface/wolf_robot_hw.h>
 //#include "myahrs+/myahrs+_imu.hpp" // the imu code
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Dense>
