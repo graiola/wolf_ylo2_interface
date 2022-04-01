@@ -1,0 +1,57 @@
+<?xml version="1.0" ?>
+<launch>
+    <arg name="task_period" default="0.001" />
+    <arg name="gui"  default="true" />
+    <arg name="robot_name"  default="ylo2" />
+
+    <!-- Export some params to the param server -->
+    <param name="task_period" value="$(arg task_period)"/>
+
+    <!-- Load the robot description -->
+    <include file="$(find wolf_description_utils)/launch/upload.launch">
+       <arg name="sensors" value="false" />
+       <arg name="robot_name" value="$(arg robot_name)" />
+       <arg name="arm_enabled" value="false"/>
+       <arg name="arm_name" value=""/>
+       <arg name="task_period" value="$(arg task_period)" />
+    </include>
+
+    <!-- Spawn the hardware interface -->
+    <node name="ylo2_hardware_interface"
+          pkg="wolf_ylo2_interface" type="ylo2_ros_node" output="screen"/>
+
+    <!-- Start Imu publisher -->
+    <node pkg="myahrs_driver" type="myahrs_driver" name="myahrs_driver">
+        <param name="port" value="/dev/ttyACM0" />
+        <param name="baud_rate" value="115200" />
+        <param name="frame_id" value="trunk" />
+        <param name="parent_frame_id_" value="world" />
+    </node>
+
+    <!-- Spawn the trunk publisher -->
+    <node name="ylo2_imu_node"
+          pkg="wolf_ylo2_interface" type="ylo2_imu_node" output="screen"/>
+
+    <!-- Loading joint states publisher configurations from YAML file to parameter server -->
+    <rosparam file="$(find wolf_ylo2_interface)/params/joint_state_publisher.yaml" ns="/$(arg robot_name)" command="load"/>
+
+    <!-- Spawn controllers -->
+    <node name="controller_spawner"
+          pkg="controller_manager" type="spawner" output="screen"
+          ns="/$(arg robot_name)"
+          args="joint_state_publisher" />
+
+    <!-- start robot state publisher -->
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen" ns="/$(arg robot_name)" />
+
+    <!-- <node pkg="robot_inertia_publisher" type="robot_inertia_publisher" name="robot_inertia_publisher" output="screen" ns="/$(arg robot_name)" /> -->
+
+    <group if="$(arg gui)">
+      <node
+       type="rviz"
+       name="rviz"
+       pkg="rviz"
+       args="-d $(find ylo2_description)/rviz/ylo2_wbc.rviz" />
+    </group>
+
+</launch>

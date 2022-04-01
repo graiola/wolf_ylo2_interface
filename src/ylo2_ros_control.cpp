@@ -21,8 +21,11 @@ void ylo2ROSControl::init()
 	// Reset RobotHW
 	robot_hw_.reset(new ylo22ros::ylo2RobotHw);
 
+  // Reseting the namespace of the node handle
+  node_handle_.reset(new ros::NodeHandle(robot_hw_->getRobotName()));
+
 	// Initializing the hardware interface
-	robot_hw_->init();
+  robot_hw_->init(*node_handle_.get());
 
 	// Reseting the controller manager
 	controller_manager_.reset(new controller_manager::ControllerManager(robot_hw_.get(), *node_handle_.get()));

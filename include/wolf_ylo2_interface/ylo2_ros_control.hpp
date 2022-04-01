@@ -31,7 +31,7 @@ private:
 	std::shared_ptr<ros::NodeHandle> node_handle_;
 	
   /** @brief ylo2 Hardware interface */
-	std::shared_ptr<ylo2RobotHw> robot_hw_;
+  std::shared_ptr<ylo22ros::ylo2RobotHw> robot_hw_;
 
   /** @brief controller_manager provides the infrastructure to load, unload, start and stop controllers */
 	std::shared_ptr<controller_manager::ControllerManager> controller_manager_;
