@@ -1,5 +1,4 @@
 #include "wolf_ylo2_interface/ylo2_robot_hw.hpp"
-#include "moteus_pcan/moteus_pcan_controller.h"
 
 namespace ylo22ros
 {

@@ -5,9 +5,7 @@
 
 #include <ros/ros.h>
 #include <controller_manager/controller_manager.h>
-
 #include "wolf_ylo2_interface/ylo2_robot_hw.hpp"
-
 
 namespace ylo22ros {
 
