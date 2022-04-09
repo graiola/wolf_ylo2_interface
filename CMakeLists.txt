@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(wolf_ylo2_interface)
 
+set(CAN_LIBS pthread rt pcanbasic)
+
 # Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
   controller_manager
@@ -27,13 +29,11 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_subdirectory(ylo2_moteus)
-
 add_executable(ylo2_ros_node
     src/ylo2_robot_hw.cpp
     src/ylo2_ros_control.cpp
     src/ylo2_ros_node.cpp)
-target_link_libraries(ylo2_ros_node ${catkin_LIBRARIES} #ylo2hal
+target_link_libraries(ylo2_ros_node ${catkin_LIBRARIES} ${CAN_LIBS} #ylo2hal
 )
 set_property(TARGET ylo2_ros_node PROPERTY CXX_STANDARD 11)
 
