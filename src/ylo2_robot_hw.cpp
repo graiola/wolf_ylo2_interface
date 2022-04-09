@@ -1,5 +1,5 @@
 #include "wolf_ylo2_interface/ylo2_robot_hw.hpp"
-//TODO #include "ylo2_moteus/???"
+#include "moteus_pcan/moteus_pcan_controller.h"
 
 namespace ylo22ros
 {
@@ -27,6 +27,15 @@ ylo2RobotHw::~ylo2RobotHw()
 {
 
 }
+
+// PEAK FDCAN PCI M2 has 4 ports and each port controls one leg (3 moteus_controllers)
+MoteusInterfaceMotorsMap interface_motors_map = 
+{
+  {"/dev/pcanpcifd0", {1,2,3,}}, {"/dev/pcanpcifd1", {4,5,6,}}, {"/dev/pcanpcifd2", {7,8,9,}}, {"/dev/pcanpcifd3", {10,11,12,}}
+};
+
+MoteusPcanController controller(interface_motors_map);
+
 
 void ylo2RobotHw::init(const ros::NodeHandle& nh)
 {
@@ -72,19 +81,18 @@ void ylo2RobotHw::init(const ros::NodeHandle& nh)
 
 void ylo2RobotHw::read()
 {
-  // Get robot data
-  //ylo2_state_ = ylo2_interface_.ReceiveObservation();
-  // replace each ylo2_interface_. to moteus ones
-  //TODO fonction read
-
   // ------
   // Joints
   // ------
+
+  float pos, vel, tor;
+
   for (unsigned int jj = 0; jj < n_dof_; ++jj)
   {
-    joint_position_[jj] = 0.0;
-    joint_velocity_[jj] = 0.0;
-    joint_effort_[jj]   = 0.0;
+    controller._motors[jj+1]->get_feedback(pos, vel, tor); // query values;
+    joint_position_[jj] = pos;
+    joint_velocity_[jj] = vel;
+    joint_effort_[jj]   = tor;
   }
 
   // Publish the IMU data NOTE: missing covariances
