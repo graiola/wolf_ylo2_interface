@@ -2,7 +2,7 @@
 #define YLO2_ROBOT_HW_H
 
 #include <wolf_hardware_interface/wolf_robot_hw.h>
-#include "moteus_pcan/moteus_pcan_controller.h"
+#include "moteus_driver/moteus_pcan_controller.h"
 #include <realtime_tools/realtime_publisher.h>
 #include <sensor_msgs/Imu.h>
 #include <eigen3/Eigen/Core>
@@ -20,6 +20,8 @@ public:
   void init(const ros::NodeHandle &nh);
   void read();
   void write();
+
+  float pos = 0, vel = 0, tor = 0;
 
 private:
 

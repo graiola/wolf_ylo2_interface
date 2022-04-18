@@ -27,6 +27,10 @@ ylo2RobotHw::~ylo2RobotHw()
 
 }
 
+//-------------------//
+// MOTEUS CONTROLLER //
+//-------------------//
+
 // PEAK FDCAN PCI M2 has 4 ports and each port controls one leg (3 moteus_controllers)
 MoteusInterfaceMotorsMap interface_motors_map = 
 {
@@ -34,6 +38,26 @@ MoteusInterfaceMotorsMap interface_motors_map =
 };
 
 MoteusPcanController controller(interface_motors_map);
+
+// query position, velocity, and torque, for all 12 motors in order (1-12)
+void query(int motor_id, float& pos, float& vel, float& tor)
+{
+  controller._motors[motor_id]->get_feedback(pos, vel, tor); // query values
+}
+
+// send fftorque order to specific id, with specific torque
+void send_tau(int motor_id, float tor)
+{
+  controller._motors[motor_id]->set_commands(tor);
+}
+
+// send a stop order to specific id
+void stop(int motor_id)
+{
+  controller._motors[motor_id]->set_stop_commands();
+}
+
+// -----------------------------------------------------
 
 
 void ylo2RobotHw::init(const ros::NodeHandle& nh)
@@ -51,48 +75,35 @@ void ylo2RobotHw::init(const ros::NodeHandle& nh)
     ROS_ERROR_NAMED(CLASS_NAME,"Failed to register joint interface.");
     return;
   }
-
-  /*
-  // Hardware interfaces: IMU
-  auto imu_name = loadImuLinkNameFromSRDF();
-  if(!imu_name.empty())
-  {
-    WolfRobotHwInterface::initializeImuInterface(imu_name);
-    registerInterface(&imu_sensor_interface_);
+  // send a stop command to all motors, to feed RX queue.
+  for (unsigned int jj = 0; jj < n_dof_; ++jj){
+    stop(jj+1);
   }
-  else
-  {
-    ROS_ERROR_NAMED(CLASS_NAME,"Failed to register imu interface.");
-    return;
-  }
-
-  // Create the IMU realtime publisher
-  imu_pub_.reset(new realtime_tools::RealtimePublisher<sensor_msgs::Imu>(nh, "IMU", 4));
-  imu_pub_->msg_.header.frame_id = imu_name;
-
-  // ylo2_interface_.InitCmdData(ylo2_lowcmd_);
-  // replace each ylo2_interface_. to moteus ones
-  //TODO fonction initialize
-  startup_routine();
-  */
+  std::cout << "all stop command sent." << std::endl;
 }
 
 
 void ylo2RobotHw::read()
 {
-  // ------
-  // Joints
-  // ------
-
-  float pos, vel, tor;
-
   for (unsigned int jj = 0; jj < n_dof_; ++jj)
   {
-    controller._motors[jj+1]->get_feedback(pos, vel, tor); // query values;
-    joint_position_[jj] = pos;
-    joint_velocity_[jj] = vel;
-    joint_effort_[jj]   = tor;
+    query(jj+1, pos, vel, tor); // query values;
+    joint_position_[jj] = pos*6;// measured in revolutions, with a 6x reduction
+    joint_velocity_[jj] = vel;   // measured in revolutions / s
+    joint_effort_[jj]   = tor;   // measured in N*m
+    //std::cout << jj+1 << "pos = " << pos << std::endl;
   }
+
+  /*
+  for (unsigned int jj = 0; jj < n_dof_; ++jj)
+  {
+    joint_position_[jj] = 0.0;
+    joint_velocity_[jj] = 0.0;
+    joint_effort_[jj]   = 0.0;
+    //std::cout << jj+1 << "pos = " << pos << std::endl;
+  }
+  */
+
 
   // Publish the IMU data NOTE: missing covariances
   if(imu_pub_.get() && imu_pub_->trylock())
@@ -115,12 +126,12 @@ void ylo2RobotHw::read()
 
 void ylo2RobotHw::write()
 {
-  //for (unsigned int jj = 0; jj < n_dof_; ++jj)
-  //ylo2_lowcmd_.motorCmd[ylo2_motor_idxs_[jj]].tau = static_cast<float>(joint_effort_command_[jj]  );
-
-  //ylo2_interface_.SendLowCmd(ylo2_lowcmd_);
-  // replace each ylo2_interface_. to moteus ones
-  //TODO fonction send fftorque
+  for (unsigned int jj = 0; jj < n_dof_; ++jj)
+    {
+      //send_tau(jj+1, static_cast<float>(joint_effort_command_[jj])/8);
+      send_tau(jj+1, 0.5);
+      //std::cout << jj+1 << "tau = " << static_cast<float>(joint_effort_command_[jj]) << std::endl;
+    }
 }
 
 void ylo2RobotHw::send_zero_command()
