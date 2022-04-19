@@ -75,11 +75,6 @@ void ylo2RobotHw::init(const ros::NodeHandle& nh)
     ROS_ERROR_NAMED(CLASS_NAME,"Failed to register joint interface.");
     return;
   }
-  // send a stop command to all motors, to feed RX queue.
-  for (unsigned int jj = 0; jj < n_dof_; ++jj){
-    stop(jj+1);
-  }
-  std::cout << "all stop command sent." << std::endl;
 }
 
 
@@ -87,22 +82,13 @@ void ylo2RobotHw::read()
 {
   for (unsigned int jj = 0; jj < n_dof_; ++jj)
   {
-    query(jj+1, pos, vel, tor); // query values;
-    joint_position_[jj] = pos*6;// measured in revolutions, with a 6x reduction
-    joint_velocity_[jj] = vel;   // measured in revolutions / s
-    joint_effort_[jj]   = tor;   // measured in N*m
-    //std::cout << jj+1 << "pos = " << pos << std::endl;
+    stop(ylo2_motor_idxs_[jj]);
+    query(ylo2_motor_idxs_[jj], pos, vel, tor); // query values;
+    joint_position_[jj] = static_cast<double>(pos*6);// measured in revolutions, with a 6x reduction
+    joint_velocity_[jj] = static_cast<double>(vel);   // measured in revolutions / s
+    joint_effort_[jj]   = static_cast<double>(tor);   // measured in N*m
+    //std::cout << jj+1 << ", pos = " << joint_position_[jj] << std::endl;
   }
-
-  /*
-  for (unsigned int jj = 0; jj < n_dof_; ++jj)
-  {
-    joint_position_[jj] = 0.0;
-    joint_velocity_[jj] = 0.0;
-    joint_effort_[jj]   = 0.0;
-    //std::cout << jj+1 << "pos = " << pos << std::endl;
-  }
-  */
 
 
   // Publish the IMU data NOTE: missing covariances
@@ -128,8 +114,7 @@ void ylo2RobotHw::write()
 {
   for (unsigned int jj = 0; jj < n_dof_; ++jj)
     {
-      //send_tau(jj+1, static_cast<float>(joint_effort_command_[jj])/8);
-      send_tau(jj+1, 0.5);
+      //send_tau(ylo2_motor_idxs_[jj], 1.0);
       //std::cout << jj+1 << "tau = " << static_cast<float>(joint_effort_command_[jj]) << std::endl;
     }
 }
@@ -137,8 +122,6 @@ void ylo2RobotHw::write()
 void ylo2RobotHw::send_zero_command()
 {
   std::array<float, 60> zero_command = {0};
-  // ylo2_interface_->SendCommand(zero_command); is equal to  // ylo2_interface_.SendCommand(zero_command); but for pointer
-  // replace each ylo2_interface_. to moteus ones
   //TODO fonction zeroing_command
 }
 

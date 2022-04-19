@@ -25,6 +25,15 @@ public:
 
 private:
 
+  // @brief Map Ylo2 internal joint indices to WoLF joints order
+  std::array<unsigned int, 12> ylo2_motor_idxs_
+          {{
+          1, 2, 3,    // LF
+          7, 8, 9,    // LH
+          4, 5, 6,    // RF
+          10, 11, 12, // RH
+          }};
+
   /** @brief IMU realtime publisher */
   std::shared_ptr<realtime_tools::RealtimePublisher<sensor_msgs::Imu>> imu_pub_;
 
