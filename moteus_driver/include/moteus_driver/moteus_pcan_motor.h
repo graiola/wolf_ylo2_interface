@@ -21,7 +21,7 @@ public:
 
     bool set_commands(float fftorque);
 
-    void get_feedback(float& position, float& velocity, float& torque);
+    bool get_feedback(float& position, float& velocity, float& torque);
 
     //void set_torque_ena(bool torque_ena_);
 
