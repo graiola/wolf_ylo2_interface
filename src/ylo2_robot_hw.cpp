@@ -2,18 +2,15 @@
 
 namespace ylo22ros
 {
-
 using namespace hardware_interface;
 
 int64_t utime_now() {
-
   struct timeval timeofday;
   gettimeofday(&timeofday,NULL);
   if (timeofday.tv_sec < 0 || timeofday.tv_sec > UINT_MAX)
     throw std::runtime_error("Timeofday is out of dual signed 32-bit range");
   uint32_t sec	= timeofday.tv_sec;
   uint32_t nsec = timeofday.tv_usec * 1000;
-
   return (int64_t) (((uint64_t)sec)*1000000 + ((uint64_t)nsec) / 1000);
 }
 
@@ -24,14 +21,13 @@ ylo2RobotHw::ylo2RobotHw()
 
 ylo2RobotHw::~ylo2RobotHw()
 {
-
 }
 
-//-------------------//
+/*-------------------//
 // MOTEUS CONTROLLER //
-//-------------------//
-
-// PEAK FDCAN PCI M2 has 4 ports and each port controls one leg (3 moteus_controllers)
+//-----------------------------------------------------------
+// MAP to access specific Peak port, regarding to queried Id
+//-----------------------------------------------------------*/
 MoteusInterfaceMotorsMap interface_motors_map = 
 {
   {"/dev/pcanpcifd0", {1,2,3,}}, {"/dev/pcanpcifd1", {4,5,6,}}, {"/dev/pcanpcifd2", {7,8,9,}}, {"/dev/pcanpcifd3", {10,11,12,}}
@@ -56,8 +52,7 @@ void stop(int motor_id)
 {
   controller._motors[motor_id]->set_stop_commands();
 }
-
-// -----------------------------------------------------
+//-----------------------------------------------------------
 
 
 void ylo2RobotHw::init(const ros::NodeHandle& nh)
@@ -84,12 +79,20 @@ void ylo2RobotHw::read()
   {
     stop(ylo2_motor_idxs_[jj]);
     query(ylo2_motor_idxs_[jj], pos, vel, tor); // query values;
-    joint_position_[jj] = static_cast<double>(pos*6);// measured in revolutions, with a 6x reduction
+
+    /* Invert rotation, depending on motors id.
+     -----------------------------------------------------*/
+    // normal:
+    if (std::find(std::begin(norm_rot_ids), std::end(norm_rot_ids), ylo2_motor_idxs_[jj]) != std::end(norm_rot_ids)){
+        joint_position_[jj] = static_cast<double>(pos*6);
+    }
+    // reverse:
+    else{
+        joint_position_[jj] = static_cast<double>(-pos*6);// measured in revolutions, with a 6x reduction
+    }
     joint_velocity_[jj] = static_cast<double>(vel);   // measured in revolutions / s
     joint_effort_[jj]   = static_cast<double>(tor);   // measured in N*m
-    //std::cout << jj+1 << ", pos = " << joint_position_[jj] << std::endl;
   }
-
 
   // Publish the IMU data NOTE: missing covariances
   if(imu_pub_.get() && imu_pub_->trylock())
@@ -114,7 +117,7 @@ void ylo2RobotHw::write()
 {
   for (unsigned int jj = 0; jj < n_dof_; ++jj)
     {
-      //send_tau(ylo2_motor_idxs_[jj], 1.0);
+      //send_tau(ylo2_motor_idxs_[jj], 0.5); // testing tau to all motors, OK
       //std::cout << jj+1 << "tau = " << static_cast<float>(joint_effort_command_[jj]) << std::endl;
     }
 }
