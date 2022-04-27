@@ -13,14 +13,18 @@ int main(int argc, char**argv)
     // Load the task_period from the param server
     ros::NodeHandle nh;
     double period;
+    bool dry_run = false;
     if(!nh.getParam("/task_period",period))
     {
         ROS_ERROR("Task period not available in the ROS param server!");
         return 1;
     }
+    nh.getParam("/dry_run",dry_run);
+    if(dry_run)
+      ROS_WARN("Ylo2 controller manager will perform a dry run (i.e. communication with the motors is disabled)");
 
     // Starting the ros control
-    _ros_control.init();
+    _ros_control.init(dry_run);
 
     // Start asynchronous ROS spinner
     ros::AsyncSpinner spinner(1); // Argument is the number of threads to use (0 means as many threads as processors)

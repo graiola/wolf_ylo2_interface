@@ -16,7 +16,7 @@ ylo2ROSControl::~ylo2ROSControl()
 }
 
 
-void ylo2ROSControl::init()
+void ylo2ROSControl::init(bool dry_run)
 {
 	// Reset RobotHW
 	robot_hw_.reset(new ylo22ros::ylo2RobotHw);

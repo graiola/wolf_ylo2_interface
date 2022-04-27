@@ -51,7 +51,7 @@ public:
   ylo2RobotHw();
   virtual ~ylo2RobotHw();
 
-  void init(const ros::NodeHandle &nh);
+  void init(const ros::NodeHandle &nh, bool dry_run = false);
   void read();
   void write();
 
@@ -62,9 +62,6 @@ private:
   void send_tau(int motor_id, float tor);
 
   void stop(int motor_id);
-
-  /** @brief if false, activate the motors interface */
-  bool dry_run_;
 
   /** @brief moteus controller, enable communication with the motors (default is false) */
   MoteusPcanControllerPtr motors_interface_;

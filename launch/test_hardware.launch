@@ -1,11 +1,13 @@
 <?xml version="1.0" ?>
 <launch>
     <arg name="task_period" default="0.001" />
+    <arg name="dry_run" default="false" />
     <arg name="gui"  default="true" />
     <arg name="robot_name"  default="ylo2" />
 
     <!-- Export some params to the param server -->
     <param name="task_period" value="$(arg task_period)"/>
+    <param name="dry_run" value="$(arg dry_run)"/>
 
     <!-- Load the robot description -->
     <include file="$(find wolf_description_utils)/launch/upload.launch">

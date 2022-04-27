@@ -17,7 +17,6 @@ int64_t utime_now() {
 ylo2RobotHw::ylo2RobotHw()
 {
   robot_name_ = "ylo2";
-  dry_run_ = true;
   tmp_pos_ = tmp_vel_ = tmp_tor_ = 0.0;
 
   // NOTE: we should load that from file
@@ -68,7 +67,7 @@ void ylo2RobotHw::stop(int motor_id)
 //-----------------------------------------------------------
 
 
-void ylo2RobotHw::init(const ros::NodeHandle& nh)
+void ylo2RobotHw::init(const ros::NodeHandle& nh, bool dry_run)
 {
   // Hardware interfaces: Joints
   auto joint_names = loadJointNamesFromSRDF();
@@ -84,7 +83,7 @@ void ylo2RobotHw::init(const ros::NodeHandle& nh)
     return;
   }
 
-  if(!dry_run_)
+  if(!dry_run)
      motors_interface_ = std::make_shared<MoteusPcanController>(motors_interface_map_);
 }
 
