@@ -20,24 +20,24 @@ ylo2RobotHw::ylo2RobotHw()
   tmp_pos_ = tmp_vel_ = tmp_tor_ = 0.0;
 
   // NOTE: we should load that from file
-  motor_adapters_.resize(12);
+  motor_adapters_.resize(12);  // exact motors order, on Ylo2
   // LF
   //                   IDX                             SIGN                            REDUCTION
-  /*HAA*/ motor_adapters_[0].setIdx(1);   motor_adapters_[0].setSign(-1);  motor_adapters_[0].setReduction(6.0);
-  /*HFE*/ motor_adapters_[1].setIdx(2);   motor_adapters_[1].setSign(-1);  motor_adapters_[1].setReduction(1.0);
-  /*KFE*/ motor_adapters_[2].setIdx(3);   motor_adapters_[2].setSign(-1);  motor_adapters_[2].setReduction(1.0);
+  /*HAA*/ motor_adapters_[0].setIdx(3);   motor_adapters_[0].setSign(-1);  motor_adapters_[0].setReduction(6.0);  // Ylo2 HAA is Id3
+  /*HFE*/ motor_adapters_[1].setIdx(1);   motor_adapters_[1].setSign(-1);  motor_adapters_[1].setReduction(6.0);  // Ylo2 HFE is Id1
+  /*KFE*/ motor_adapters_[2].setIdx(2);   motor_adapters_[2].setSign(-1);  motor_adapters_[2].setReduction(9.0);  // Ylo2 KFE is Id2
   // LH
-  /*HAA*/ motor_adapters_[3].setIdx(7);   motor_adapters_[3].setSign(1);   motor_adapters_[3].setReduction(6.0);
-  /*HFE*/ motor_adapters_[4].setIdx(8);   motor_adapters_[4].setSign(-1);  motor_adapters_[4].setReduction(1.0);
-  /*KFE*/ motor_adapters_[5].setIdx(9);   motor_adapters_[5].setSign(-1);  motor_adapters_[5].setReduction(1.0);
+  /*HAA*/ motor_adapters_[3].setIdx(9);   motor_adapters_[3].setSign(1);   motor_adapters_[3].setReduction(6.0);  //...
+  /*HFE*/ motor_adapters_[4].setIdx(7);   motor_adapters_[4].setSign(-1);  motor_adapters_[4].setReduction(6.0);
+  /*KFE*/ motor_adapters_[5].setIdx(8);   motor_adapters_[5].setSign(-1);  motor_adapters_[5].setReduction(9.0);
   // RF
-  /*HAA*/ motor_adapters_[6].setIdx(4);   motor_adapters_[6].setSign(-1);  motor_adapters_[6].setReduction(6.0);
-  /*HFE*/ motor_adapters_[7].setIdx(5);   motor_adapters_[7].setSign(1);   motor_adapters_[7].setReduction(1.0);
-  /*KFE*/ motor_adapters_[8].setIdx(6);   motor_adapters_[8].setSign(1);   motor_adapters_[8].setReduction(1.0);
+  /*HAA*/ motor_adapters_[6].setIdx(6);   motor_adapters_[6].setSign(-1);  motor_adapters_[6].setReduction(6.0);
+  /*HFE*/ motor_adapters_[7].setIdx(4);   motor_adapters_[7].setSign(1);   motor_adapters_[7].setReduction(6.0);
+  /*KFE*/ motor_adapters_[8].setIdx(5);   motor_adapters_[8].setSign(1);   motor_adapters_[8].setReduction(9.0);
   // RH
-  /*HAA*/ motor_adapters_[9].setIdx(10);  motor_adapters_[9].setSign(1);   motor_adapters_[9].setReduction(6.0);
-  /*HFE*/ motor_adapters_[10].setIdx(11); motor_adapters_[10].setSign(1);  motor_adapters_[10].setReduction(1.0);
-  /*KFE*/ motor_adapters_[11].setIdx(12); motor_adapters_[11].setSign(1);  motor_adapters_[11].setReduction(1.0);
+  /*HAA*/ motor_adapters_[9].setIdx(12);  motor_adapters_[9].setSign(1);   motor_adapters_[9].setReduction(6.0);
+  /*HFE*/ motor_adapters_[10].setIdx(10); motor_adapters_[10].setSign(1);  motor_adapters_[10].setReduction(6.0);
+  /*KFE*/ motor_adapters_[11].setIdx(11); motor_adapters_[11].setSign(1);  motor_adapters_[11].setReduction(9.0);
 }
 
 ylo2RobotHw::~ylo2RobotHw()
@@ -109,6 +109,15 @@ void ylo2RobotHw::read()
     joint_velocity_[jj] = static_cast<double>(tmp_vel_);   // measured in revolutions / s
     joint_effort_[jj]   = static_cast<double>(tmp_tor_);   // measured in N*m
   }
+  std::cout << "joints = ";     
+  for (int i=0;i<joint_position_.size();i++)
+      std::cout << " " << floor(joint_position_[i] * 1000) / 1000; // rounded to .000
+      std::cout << '\n';
+
+  // Comment :
+  // joints =  0.26 -0.296 0.38 0.53 0.267 0.34 0.249 -0.282 0.433 0.225 0.265 0.194
+  // index 0 (0.26) comes from Id2 (LF KFE) !!  It should be Id3 (LF HAA), regarding to motor_adapters_  , no ??
+
 
   // Publish the IMU data NOTE: missing covariances
   if(imu_pub_.get() && imu_pub_->trylock())
