@@ -1,3 +1,4 @@
+<?xml version="1.0" ?>
 <launch>
     <arg name="task_period" default="0.001" />
     <arg name="gui"  default="true" />
