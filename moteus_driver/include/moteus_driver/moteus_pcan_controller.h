@@ -15,6 +15,7 @@ typedef std::map<std::string, std::vector<int>> MoteusInterfaceMotorsMap;
 
 class MoteusPcanController{
 public:
+
     MoteusPcanController(const MoteusInterfaceMotorsMap& interface_motors_map);
     ~MoteusPcanController();
     bool is_initialized();
@@ -33,5 +34,7 @@ private:
     MoteusInterfaceMotorsMap _interface_motors_map;
     std::vector<MoteusPcanInterfacePtr> _interfaces;
 };
+
+typedef std::shared_ptr<MoteusPcanController> MoteusPcanControllerPtr;
 
 #endif

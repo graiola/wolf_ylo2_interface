@@ -11,6 +11,40 @@
 namespace ylo22ros
 {
 
+struct MotorAdapter
+{
+
+public:
+
+  MotorAdapter()
+  {
+    idx_ = -1;
+    sign_ = 1;
+    reduction_ = 1.0;
+  }
+
+  MotorAdapter(int idx, int sign, double reduction)
+  {
+    idx_ = idx;
+    sign_ = sign;
+    reduction_ = reduction;
+  }
+
+  const int& getIdx() {return idx_;}
+  const int& getSign() {return sign_;}
+  const double& getReduction() {return reduction_;}
+
+  void setIdx(int idx) {idx_ = idx;}
+  void setSign(int sign) {sign_ = sign;}
+  void setReduction(double reduction) {reduction_ = reduction;};
+
+private:
+
+  int idx_;
+  int sign_;
+  double reduction_;
+};
+
 class ylo2RobotHw : public hardware_interface::RobotHW, public hardware_interface::WolfRobotHwInterface
 {
 public:
@@ -21,21 +55,27 @@ public:
   void read();
   void write();
 
-  float pos = 0, vel = 0, tor = 0;
-
 private:
 
-  // normal rotation motors id's
-  std::set<int> norm_rot_ids {5, 6, 7, 10, 11, 12}; // others need to reverse
+  void query(int motor_id, float& pos, float& vel, float& tor);
 
-  // @brief Map Ylo2 internal joint indices to WoLF joints order
-  std::array<unsigned int, 12> ylo2_motor_idxs_
-          {
-          1, 2, 3,    // LF
-          7, 8, 9,    // LH
-          4, 5, 6,    // RF
-          10, 11, 12, // RH
-          };
+  void send_tau(int motor_id, float tor);
+
+  void stop(int motor_id);
+
+  /** @brief if false, activate the motors interface */
+  bool dry_run_;
+
+  /** @brief moteus controller, enable communication with the motors (default is false) */
+  MoteusPcanControllerPtr motors_interface_;
+
+  std::vector<MotorAdapter> motor_adapters_;
+
+  /** @brief map to access specific Peak port, regarding to queried Id */
+  MoteusInterfaceMotorsMap motors_interface_map_ =
+  {
+    {"/dev/pcanpcifd0", {1,2,3,}}, {"/dev/pcanpcifd1", {4,5,6,}}, {"/dev/pcanpcifd2", {7,8,9,}}, {"/dev/pcanpcifd3", {10,11,12,}}
+  };
 
   /** @brief IMU realtime publisher */
   std::shared_ptr<realtime_tools::RealtimePublisher<sensor_msgs::Imu>> imu_pub_;
@@ -45,6 +85,10 @@ private:
 
   /** @brief Executes the robot's startup routine */
   void startup_routine();
+
+  float tmp_pos_;
+  float tmp_vel_;
+  float tmp_tor_;
 
 };
 

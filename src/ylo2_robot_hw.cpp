@@ -17,40 +17,53 @@ int64_t utime_now() {
 ylo2RobotHw::ylo2RobotHw()
 {
   robot_name_ = "ylo2";
+  dry_run_ = true;
+  tmp_pos_ = tmp_vel_ = tmp_tor_ = 0.0;
+
+  // NOTE: we should load that from file
+  motor_adapters_.resize(12);
+  // LF
+  //                   IDX                             SIGN                            REDUCTION
+  /*HAA*/ motor_adapters_[0].setIdx(1);   motor_adapters_[0].setSign(-1);  motor_adapters_[0].setReduction(6.0);
+  /*HFE*/ motor_adapters_[1].setIdx(2);   motor_adapters_[1].setSign(-1);  motor_adapters_[1].setReduction(1.0);
+  /*KFE*/ motor_adapters_[2].setIdx(3);   motor_adapters_[2].setSign(-1);  motor_adapters_[2].setReduction(1.0);
+  // LH
+  /*HAA*/ motor_adapters_[3].setIdx(7);   motor_adapters_[3].setSign(1);   motor_adapters_[3].setReduction(6.0);
+  /*HFE*/ motor_adapters_[4].setIdx(8);   motor_adapters_[4].setSign(-1);  motor_adapters_[4].setReduction(1.0);
+  /*KFE*/ motor_adapters_[5].setIdx(9);   motor_adapters_[5].setSign(-1);  motor_adapters_[5].setReduction(1.0);
+  // RF
+  /*HAA*/ motor_adapters_[6].setIdx(4);   motor_adapters_[6].setSign(-1);  motor_adapters_[6].setReduction(6.0);
+  /*HFE*/ motor_adapters_[7].setIdx(5);   motor_adapters_[7].setSign(1);   motor_adapters_[7].setReduction(1.0);
+  /*KFE*/ motor_adapters_[8].setIdx(6);   motor_adapters_[8].setSign(1);   motor_adapters_[8].setReduction(1.0);
+  // RH
+  /*HAA*/ motor_adapters_[9].setIdx(10);  motor_adapters_[9].setSign(1);   motor_adapters_[9].setReduction(6.0);
+  /*HFE*/ motor_adapters_[10].setIdx(11); motor_adapters_[10].setSign(1);  motor_adapters_[10].setReduction(1.0);
+  /*KFE*/ motor_adapters_[11].setIdx(12); motor_adapters_[11].setSign(1);  motor_adapters_[11].setReduction(1.0);
 }
 
 ylo2RobotHw::~ylo2RobotHw()
 {
 }
 
-/*-------------------//
-// MOTEUS CONTROLLER //
-//-----------------------------------------------------------
-// MAP to access specific Peak port, regarding to queried Id
-//-----------------------------------------------------------*/
-MoteusInterfaceMotorsMap interface_motors_map = 
-{
-  {"/dev/pcanpcifd0", {1,2,3,}}, {"/dev/pcanpcifd1", {4,5,6,}}, {"/dev/pcanpcifd2", {7,8,9,}}, {"/dev/pcanpcifd3", {10,11,12,}}
-};
-
-MoteusPcanController controller(interface_motors_map);
-
 // query position, velocity, and torque, for all 12 motors in order (1-12)
-void query(int motor_id, float& pos, float& vel, float& tor)
+void ylo2RobotHw::query(int motor_id, float& pos, float& vel, float& tor)
 {
-  controller._motors[motor_id]->get_feedback(pos, vel, tor); // query values
+  if(motors_interface_)
+    motors_interface_->_motors[motor_id]->get_feedback(pos, vel, tor); // query values
 }
 
 // send fftorque order to specific id, with specific torque
-void send_tau(int motor_id, float tor)
+void ylo2RobotHw::send_tau(int motor_id, float tor)
 {
-  controller._motors[motor_id]->set_commands(tor);
+  if(motors_interface_)
+    motors_interface_->_motors[motor_id]->set_commands(tor);
 }
 
 // send a stop order to specific id
-void stop(int motor_id)
+void ylo2RobotHw::stop(int motor_id)
 {
-  controller._motors[motor_id]->set_stop_commands();
+  if(motors_interface_)
+    motors_interface_->_motors[motor_id]->set_stop_commands();
 }
 //-----------------------------------------------------------
 
@@ -70,28 +83,32 @@ void ylo2RobotHw::init(const ros::NodeHandle& nh)
     ROS_ERROR_NAMED(CLASS_NAME,"Failed to register joint interface.");
     return;
   }
+
+  if(!dry_run_)
+     motors_interface_ = std::make_shared<MoteusPcanController>(motors_interface_map_);
 }
 
 
 void ylo2RobotHw::read()
 {
+
   for (unsigned int jj = 0; jj < n_dof_; ++jj)
   {
-    stop(ylo2_motor_idxs_[jj]);
-    query(ylo2_motor_idxs_[jj], pos, vel, tor); // query values;
 
-    /* Invert rotation, depending on motors id.
-     -----------------------------------------------------*/
-    // normal:
-    if (std::find(std::begin(norm_rot_ids), std::end(norm_rot_ids), ylo2_motor_idxs_[jj]) != std::end(norm_rot_ids)){
-        joint_position_[jj] = static_cast<double>(pos*6);
-    }
-    // reverse:
-    else{
-        joint_position_[jj] = static_cast<double>(-pos*6);// measured in revolutions, with a 6x reduction
-    }
-    joint_velocity_[jj] = static_cast<double>(vel);   // measured in revolutions / s
-    joint_effort_[jj]   = static_cast<double>(tor);   // measured in N*m
+    // Reset
+    tmp_vel_ = 0.0;
+    tmp_tor_ = 0.0;
+
+    auto idx = motor_adapters_[jj].getIdx();
+    auto sign = motor_adapters_[jj].getSign();
+    auto red = motor_adapters_[jj].getReduction();
+
+    stop(idx);
+    query(idx, tmp_pos_, tmp_vel_, tmp_tor_); // query values;
+
+    joint_position_[jj] = static_cast<double>(sign*tmp_pos_*red);
+    joint_velocity_[jj] = static_cast<double>(tmp_vel_);   // measured in revolutions / s
+    joint_effort_[jj]   = static_cast<double>(tmp_tor_);   // measured in N*m
   }
 
   // Publish the IMU data NOTE: missing covariances
