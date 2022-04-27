@@ -24,7 +24,7 @@
         <param name="port" value="/dev/ttyACM0" />
         <param name="baud_rate" value="115200" />
         <param name="frame_id" value="trunk" />
-        <param name="parent_frame_id_" value="world" />
+        <param name="parent_frame_id" value="world" />
     </node>
 
     <!-- Spawn the trunk publisher -->

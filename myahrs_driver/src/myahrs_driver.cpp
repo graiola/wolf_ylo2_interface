@@ -89,7 +89,7 @@ public:
     // default frame id
     nh_priv_.param("frame_id", frame_id_, std::string("imu_link"));
     // for testing the tf
-    nh_priv_.param("parent_frame_id_", parent_frame_id_, std::string("base_link"));
+    nh_priv_.param("parent_frame_id", parent_frame_id_, std::string("base_link"));
     // defaults obtained experimentally from device
     nh_priv_.param("linear_acceleration_stddev", linear_acceleration_stddev_, 0.026831);
     nh_priv_.param("angular_velocity_stddev", angular_velocity_stddev_, 0.002428);
