@@ -94,23 +94,6 @@ void ylo2RobotHw::read()
     joint_effort_[jj]   = static_cast<double>(tor);   // measured in N*m
   }
 
-  // Publish the IMU data NOTE: missing covariances
-  if(imu_pub_.get() && imu_pub_->trylock())
-  {
-    imu_pub_->msg_.orientation.w         = imu_orientation_[0];
-    imu_pub_->msg_.orientation.x         = imu_orientation_[1];
-    imu_pub_->msg_.orientation.y         = imu_orientation_[2];
-    imu_pub_->msg_.orientation.z         = imu_orientation_[3];
-    imu_pub_->msg_.angular_velocity.x    = imu_ang_vel_[0];
-    imu_pub_->msg_.angular_velocity.y    = imu_ang_vel_[1];
-    imu_pub_->msg_.angular_velocity.z    = imu_ang_vel_[2];
-    imu_pub_->msg_.linear_acceleration.x = imu_lin_acc_[0];
-    imu_pub_->msg_.linear_acceleration.y = imu_lin_acc_[1];
-    imu_pub_->msg_.linear_acceleration.z = imu_lin_acc_[2];
-    imu_pub_->msg_.header.stamp = ros::Time::now();
-    imu_pub_->unlockAndPublish();
-  }
-
 }
 
 void ylo2RobotHw::write()

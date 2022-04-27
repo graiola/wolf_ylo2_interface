@@ -26,6 +26,10 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+# Imu driver
+add_subdirectory(myahrs_driver)
+
+# Motors driver
 add_subdirectory(moteus_driver)
 
 add_executable(ylo2_ros_node
@@ -35,11 +39,6 @@ add_executable(ylo2_ros_node
 target_link_libraries(ylo2_ros_node moteus_driver ${catkin_LIBRARIES})
 set_property(TARGET ylo2_ros_node PROPERTY CXX_STANDARD 11)
 
-add_executable(ylo2_imu_node
-    src/ylo2_imu_node.cpp)
-target_link_libraries(ylo2_imu_node ${catkin_LIBRARIES})
-set_property(TARGET ylo2_imu_node PROPERTY CXX_STANDARD 11)
-
 
 #############
 ## Install ##
@@ -48,7 +47,7 @@ set_property(TARGET ylo2_imu_node PROPERTY CXX_STANDARD 11)
 install(DIRECTORY include/${PROJECT_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
 
-install(TARGETS ylo2_ros_node ylo2_imu_node
+install(TARGETS ylo2_ros_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

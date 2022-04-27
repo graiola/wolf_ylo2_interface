@@ -37,9 +37,6 @@ private:
           10, 11, 12, // RH
           };
 
-  /** @brief IMU realtime publisher */
-  std::shared_ptr<realtime_tools::RealtimePublisher<sensor_msgs::Imu>> imu_pub_;
-
   /** @brief Sends a zero command to the robot */
   void send_zero_command();
 
