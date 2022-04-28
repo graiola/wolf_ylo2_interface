@@ -23,12 +23,12 @@
           pkg="wolf_ylo2_interface" type="ylo2_ros_node" output="screen"/>
 
     <!-- Start Imu publisher -->
-    <!-- <node pkg="myahrs_driver" type="myahrs_driver" name="myahrs_driver">
+    <node pkg="myahrs_driver" type="myahrs_driver" name="myahrs_driver">
         <param name="port" value="/dev/ttyACM0" />
         <param name="baud_rate" value="115200" />
         <param name="frame_id" value="trunk" />
         <param name="parent_frame_id" value="world" />
-    </node> -->
+    </node>
 
     <!-- Spawn the trunk publisher -->
     <node name="ylo2_imu_node"
