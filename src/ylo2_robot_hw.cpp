@@ -21,23 +21,27 @@ ylo2RobotHw::ylo2RobotHw()
 
   // NOTE: we should load that from file
   motor_adapters_.resize(12);  // exact motors order, on Ylo2
-  // LF
+
   //                   IDX                             SIGN                            REDUCTION
-  /*HAA*/ motor_adapters_[0].setIdx(3);   motor_adapters_[0].setSign(-1);  motor_adapters_[0].setReduction(6.0);  // Ylo2 HAA is Id3
-  /*HFE*/ motor_adapters_[1].setIdx(1);   motor_adapters_[1].setSign(-1);  motor_adapters_[1].setReduction(6.0);  // Ylo2 HFE is Id1
-  /*KFE*/ motor_adapters_[2].setIdx(2);   motor_adapters_[2].setSign(-1);  motor_adapters_[2].setReduction(9.0);  // Ylo2 KFE is Id2
+  // LF
+  /*HAA*/ motor_adapters_[0].setIdx(1);   motor_adapters_[0].setSign(-1);  motor_adapters_[0].setReduction(6.0); // épaule.
+  /*HFE*/ motor_adapters_[1].setIdx(2);   motor_adapters_[1].setSign(-1);  motor_adapters_[1].setReduction(6.0); // coude.
+  /*KFE*/ motor_adapters_[2].setIdx(3);   motor_adapters_[2].setSign(-1);  motor_adapters_[2].setReduction(9.0); // hanche.
+
   // LH
-  /*HAA*/ motor_adapters_[3].setIdx(9);   motor_adapters_[3].setSign(1);   motor_adapters_[3].setReduction(6.0);  //...
-  /*HFE*/ motor_adapters_[4].setIdx(7);   motor_adapters_[4].setSign(-1);  motor_adapters_[4].setReduction(6.0);
-  /*KFE*/ motor_adapters_[5].setIdx(8);   motor_adapters_[5].setSign(-1);  motor_adapters_[5].setReduction(9.0);
+  /*HAA*/ motor_adapters_[3].setIdx(7);   motor_adapters_[3].setSign(1);   motor_adapters_[3].setReduction(6.0);
+  /*HFE*/ motor_adapters_[4].setIdx(8);   motor_adapters_[4].setSign(-1);  motor_adapters_[4].setReduction(6.0);
+  /*KFE*/ motor_adapters_[5].setIdx(9);   motor_adapters_[5].setSign(-1);  motor_adapters_[5].setReduction(9.0);
+
   // RF
-  /*HAA*/ motor_adapters_[6].setIdx(6);   motor_adapters_[6].setSign(-1);  motor_adapters_[6].setReduction(6.0);
-  /*HFE*/ motor_adapters_[7].setIdx(4);   motor_adapters_[7].setSign(1);   motor_adapters_[7].setReduction(6.0);
-  /*KFE*/ motor_adapters_[8].setIdx(5);   motor_adapters_[8].setSign(1);   motor_adapters_[8].setReduction(9.0);
+  /*HAA*/ motor_adapters_[6].setIdx(4);   motor_adapters_[6].setSign(-1);  motor_adapters_[6].setReduction(6.0);
+  /*HFE*/ motor_adapters_[7].setIdx(5);   motor_adapters_[7].setSign(1);   motor_adapters_[7].setReduction(6.0);
+  /*KFE*/ motor_adapters_[8].setIdx(6);   motor_adapters_[8].setSign(1);   motor_adapters_[8].setReduction(9.0);
+
   // RH
-  /*HAA*/ motor_adapters_[9].setIdx(12);  motor_adapters_[9].setSign(1);   motor_adapters_[9].setReduction(6.0);
-  /*HFE*/ motor_adapters_[10].setIdx(10); motor_adapters_[10].setSign(1);  motor_adapters_[10].setReduction(6.0);
-  /*KFE*/ motor_adapters_[11].setIdx(11); motor_adapters_[11].setSign(1);  motor_adapters_[11].setReduction(9.0);
+  /*HAA*/ motor_adapters_[9].setIdx(10);  motor_adapters_[9].setSign(1);   motor_adapters_[9].setReduction(6.0);
+  /*HFE*/ motor_adapters_[10].setIdx(11); motor_adapters_[10].setSign(1);  motor_adapters_[10].setReduction(6.0);
+  /*KFE*/ motor_adapters_[11].setIdx(12); motor_adapters_[11].setSign(1);  motor_adapters_[11].setReduction(9.0);
 }
 
 ylo2RobotHw::~ylo2RobotHw()
