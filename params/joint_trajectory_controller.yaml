@@ -14,15 +14,15 @@ joint_trajectory_controller:
     - rh_hfe_joint
     - rh_kfe_joint
   gains: # Required because we're controlling an effort interface
-    lf_haa_joint: {p: 100,  d: 1, i: 1, i_clamp: 1}
-    lf_hfe_joint: {p: 100,  d: 1, i: 1, i_clamp: 1}
-    lf_kfe_joint: {p: 100,  d: 1, i: 1, i_clamp: 1}
-    rf_haa_joint: {p: 100,  d: 1, i: 1, i_clamp: 1}
-    rf_hfe_joint: {p: 100,  d: 1, i: 1, i_clamp: 1}
-    rf_kfe_joint: {p: 100,  d: 1, i: 1, i_clamp: 1}
-    lh_haa_joint: {p: 100,  d: 1, i: 1, i_clamp: 1}
-    lh_hfe_joint: {p: 100,  d: 1, i: 1, i_clamp: 1}
-    lh_kfe_joint: {p: 100,  d: 1, i: 1, i_clamp: 1}
-    rh_haa_joint: {p: 100,  d: 1, i: 1, i_clamp: 1}
-    rh_hfe_joint: {p: 100,  d: 1, i: 1, i_clamp: 1}
-    rh_kfe_joint: {p: 100,  d: 1, i: 1, i_clamp: 1}
+    lf_haa_joint: {p: 05,  d: 1, i: 1, i_clamp: 1}
+    lf_hfe_joint: {p: 05,  d: 1, i: 1, i_clamp: 1}
+    lf_kfe_joint: {p: 05,  d: 1, i: 1, i_clamp: 1}
+    rf_haa_joint: {p: 05,  d: 1, i: 1, i_clamp: 1}
+    rf_hfe_joint: {p: 05,  d: 1, i: 1, i_clamp: 1}
+    rf_kfe_joint: {p: 05,  d: 1, i: 1, i_clamp: 1}
+    lh_haa_joint: {p: 05,  d: 1, i: 1, i_clamp: 1}
+    lh_hfe_joint: {p: 05,  d: 1, i: 1, i_clamp: 1}
+    lh_kfe_joint: {p: 05,  d: 1, i: 1, i_clamp: 1}
+    rh_haa_joint: {p: 05,  d: 1, i: 1, i_clamp: 1}
+    rh_hfe_joint: {p: 05,  d: 1, i: 1, i_clamp: 1}
+    rh_kfe_joint: {p: 05,  d: 1, i: 1, i_clamp: 1}
