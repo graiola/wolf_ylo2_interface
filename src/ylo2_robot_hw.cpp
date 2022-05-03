@@ -49,10 +49,17 @@ ylo2RobotHw::~ylo2RobotHw()
 }
 
 // query position, velocity, and torque, for all 12 motors in order (1-12)
-void ylo2RobotHw::query(int motor_id, float& pos, float& vel, float& tor)
+void ylo2RobotHw::read_rx_queue(int motor_id, float& pos, float& vel, float& tor)
 {
   if(motors_interface_)
     motors_interface_->_motors[motor_id]->get_feedback(pos, vel, tor); // query values
+}
+
+// send a query to ask only pos, vel and torque.
+void ylo2RobotHw::send_query_only_command(int motor_id)
+{
+  if(motors_interface_)
+    motors_interface_->_motors[motor_id]->set_query_only_commands();
 }
 
 // send fftorque order to specific id, with specific torque
@@ -68,6 +75,7 @@ void ylo2RobotHw::stop(int motor_id)
   if(motors_interface_)
     motors_interface_->_motors[motor_id]->set_stop_commands();
 }
+
 //-----------------------------------------------------------
 
 
@@ -89,6 +97,8 @@ void ylo2RobotHw::init(const ros::NodeHandle& nh, bool dry_run)
 
   if(!dry_run)
      motors_interface_ = std::make_shared<MoteusPcanController>(motors_interface_map_);
+
+  ylo2RobotHw::startup_routine();
 }
 
 
@@ -97,7 +107,6 @@ void ylo2RobotHw::read()
 
   for (unsigned int jj = 0; jj < n_dof_; ++jj)
   {
-
     // Reset
     tmp_vel_ = 0.0;
     tmp_tor_ = 0.0;
@@ -106,22 +115,18 @@ void ylo2RobotHw::read()
     auto sign = motor_adapters_[jj].getSign();
     auto red = motor_adapters_[jj].getReduction();
 
-    stop(idx);
-    query(idx, tmp_pos_, tmp_vel_, tmp_tor_); // query values;
+    //TODO: modify this function to queru all 12 motors,separatly, to reduce the usleep,
+    // and call it before the for
+    send_query_only_command(idx); // feed Peak Rx queue
+    // The maximum of 64 data bytes per CAN FD frame can be transmitted with bit rates up to 12 Mbit/s. 
+    usleep(50); // add a small pause, to let time for rx slot feed. (tested with 10  => some errors!)
+    read_rx_queue(idx, tmp_pos_, tmp_vel_, tmp_tor_); // query values;
 
     joint_position_[jj] = static_cast<double>(sign*tmp_pos_*red);
     joint_velocity_[jj] = static_cast<double>(tmp_vel_);   // measured in revolutions / s
     joint_effort_[jj]   = static_cast<double>(tmp_tor_);   // measured in N*m
+    //std::cout << "query joints: " << idx << " pos: " << joint_position_[jj] << std::endl;
   }
-  std::cout << "joints = ";     
-  for (int i=0;i<joint_position_.size();i++)
-      std::cout << " " << floor(joint_position_[i] * 1000) / 1000; // rounded to .000
-      std::cout << '\n';
-
-  // Comment :
-  // joints =  0.26 -0.296 0.38 0.53 0.267 0.34 0.249 -0.282 0.433 0.225 0.265 0.194
-  // index 0 (0.26) comes from Id2 (LF KFE) !!  It should be Id3 (LF HAA), regarding to motor_adapters_  , no ??
-
 
   // Publish the IMU data NOTE: missing covariances
   if(imu_pub_.get() && imu_pub_->trylock())
@@ -146,8 +151,9 @@ void ylo2RobotHw::write()
 {
   for (unsigned int jj = 0; jj < n_dof_; ++jj)
     {
-      //send_tau(ylo2_motor_idxs_[jj], 0.5); // testing tau to all motors, OK
-      //std::cout << jj+1 << "tau = " << static_cast<float>(joint_effort_command_[jj]) << std::endl;
+      auto idxx = motor_adapters_[jj].getIdx();
+      //send_tau(idxx, static_cast<float>(joint_effort_command_[jj]));
+      //std::cout << "idx: " << idxx << " and tau: " << float (joint_effort_command_[jj]) << std::endl;
     }
 }
 
@@ -159,7 +165,13 @@ void ylo2RobotHw::send_zero_command()
 
 void ylo2RobotHw::startup_routine()
 {
-  send_zero_command();
+  for (unsigned int jj = 0; jj < n_dof_; ++jj)
+  {
+    auto idx = motor_adapters_[jj].getIdx();
+    stop(idx);
+    usleep(100);
+  }
+  std::cout << "startup_routine Done." << std::endl;
 }
 
 } // namespace

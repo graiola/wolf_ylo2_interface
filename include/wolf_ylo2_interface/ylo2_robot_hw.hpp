@@ -57,11 +57,13 @@ public:
 
 private:
 
-  void query(int motor_id, float& pos, float& vel, float& tor);
+  void read_rx_queue(int motor_id, float& pos, float& vel, float& tor);
 
   void send_tau(int motor_id, float tor);
 
   void stop(int motor_id);
+
+  void send_query_only_command(int motor_id);
 
   /** @brief moteus controller, enable communication with the motors (default is false) */
   MoteusPcanControllerPtr motors_interface_;
@@ -82,6 +84,7 @@ private:
 
   /** @brief Executes the robot's startup routine */
   void startup_routine();
+  std::mutex startup_routine_mutex;
 
   float tmp_pos_;
   float tmp_vel_;
