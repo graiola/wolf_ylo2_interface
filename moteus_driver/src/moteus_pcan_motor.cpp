@@ -118,17 +118,15 @@ bool MoteusPcanMotor::set_commands(float fftorque){
 
 bool MoteusPcanMotor::get_feedback(float& position, float& velocity, float& torque){
     //std::lock_guard<std::mutex> guard(_feedback_mutex);
-    while(true){
-        if(!_can_device_ptr->Receive(_rx_msg)){ // si erreur,
-            return false;
-        }
-        memcpy(&_position, &_rx_msg.data[MSGRX_ADDR_POSITION], sizeof(float));
-        memcpy(&_velocity, &_rx_msg.data[MSGRX_ADDR_VELOCITY], sizeof(float));
-        memcpy(&_torque,   &_rx_msg.data[MSGRX_ADDR_TORQUE],   sizeof(float));
-        position = _position;   
-        velocity = _velocity;
-        torque = _torque;
-        _comm_position = position;
-        return true;
+    if(!_can_device_ptr->Receive(_rx_msg)){ // si erreur,
+        return false;
     }
+    memcpy(&_position, &_rx_msg.data[MSGRX_ADDR_POSITION], sizeof(float));
+    memcpy(&_velocity, &_rx_msg.data[MSGRX_ADDR_VELOCITY], sizeof(float));
+    memcpy(&_torque,   &_rx_msg.data[MSGRX_ADDR_TORQUE],   sizeof(float));
+    position = _position;   
+    velocity = _velocity;
+    torque = _torque;
+    _comm_position = position;
+    return true;
 }
