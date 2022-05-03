@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string.h> 
 #include <mutex>
+#include <iterator>
 
 #include "moteus_pcan_motor.h"
 
@@ -19,6 +20,8 @@ public:
 
     bool set_stop_commands();
 
+    bool set_query_only_commands();
+
     bool set_commands(float fftorque);
 
     bool get_feedback(float& position, float& velocity, float& torque);
@@ -30,6 +33,7 @@ private:
     uint32_t _id;
     PCANDevice* _can_device_ptr;
     CANDevice::CAN_msg_t _msg_tx_stop;
+    CANDevice::CAN_msg_t _msg_tx_query_only;
     CANDevice::CAN_msg_t _tx_msg;
     CANDevice::CAN_msg_t _rx_msg;
     int _fail;

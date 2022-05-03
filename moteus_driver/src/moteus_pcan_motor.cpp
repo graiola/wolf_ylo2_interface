@@ -1,5 +1,6 @@
 // File adapted for Ylo2 robot, for pure torque commands
 #include "moteus_driver/moteus_pcan_motor.h"
+
 // TX
 #define MSGTX_ADDR_POSITION 0x06
 #define MSGTX_ADDR_VELOCITY 0x0A
@@ -22,6 +23,15 @@ MoteusPcanMotor::MoteusPcanMotor(uint32_t id, PCANDevice* can_device_ptr)
     , _fail(0)
 {
     
+
+    // TX QUERY ONLY PACKAGE
+    _msg_tx_query_only.id = 0x8000 | id; // in moteus lib, for example 0x8002 means 80 = query values, and 02 = ID
+    _msg_tx_query_only.length = 2;
+    // Query
+    _msg_tx_query_only.data[0] = 0x1F; // Read floats (0x1C) | Read 3 registers (0x03)
+    _msg_tx_query_only.data[1] = 0x01; // Starting register: POSITION, VELOCITY, TORQUE
+
+
     // TX STOP PACKAGE
     _msg_tx_stop.id = 0x8000 | id; // in moteus lib, for example 0x8002 means 80 = query values, and 02 = ID
     _msg_tx_stop.length = 5;
@@ -33,7 +43,11 @@ MoteusPcanMotor::MoteusPcanMotor(uint32_t id, PCANDevice* can_device_ptr)
     _msg_tx_stop.data[3] = 0x1F; // Read floats (0x1C) | Read 3 registers (0x03)
     _msg_tx_stop.data[4] = 0x01; // Starting register: POSITION, VELOCITY, TORQUE
 
-    // -----------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------
+    //                                    pos      vel     fftor      kp       kd    max-tor
+    // exemple de tx: 01 00 0a 0c 06 20 3e800000 3fc00000 3fc00000 00000000 00000000 41400000
+    // ---------------------------------------------------------------------------------------
+
 
     // TX POS PACKAGE for Tau mode only (torque, kp=0, kd=0)
     _tx_msg.id = 0x8000 | id;
@@ -53,10 +67,10 @@ MoteusPcanMotor::MoteusPcanMotor(uint32_t id, PCANDevice* can_device_ptr)
     // Initial values
     _comm_position = 0.0;
     _comm_velocity = 0.0;
-    _comm_fftorque = 1.5;
+    _comm_fftorque = 0.5;
     _comm_kp_scale = 0.0;
     _comm_kd_scale = 0.0;
-    _comm_maxtorqu = 2.0; // NaN for max
+    _comm_maxtorqu = 0.5; // NaN for max
 }
 
 MoteusPcanMotor::~MoteusPcanMotor(){}
@@ -70,15 +84,29 @@ bool MoteusPcanMotor::set_stop_commands(){
     return true;
 }
 
+bool MoteusPcanMotor::set_query_only_commands(){
+    //std::lock_guard<std::mutex> guard(_command_mutex);
+    if(!_can_device_ptr->Send(_msg_tx_query_only)){
+        std::cout << "query_only command error" << std::endl;
+        return false;
+    };
+    return true;
+}
+
 bool MoteusPcanMotor::set_commands(float fftorque){
     //std::lock_guard<std::mutex> guard(_command_mutex);
     _comm_fftorque = fftorque;
-    memcpy(&_tx_msg.data[MSGTX_ADDR_POSITION], &_comm_position, sizeof(float));
-    memcpy(&_tx_msg.data[MSGTX_ADDR_VELOCITY], &_comm_velocity, sizeof(float));
-    memcpy(&_tx_msg.data[MSGTX_ADDR_FFTORQUE], &_comm_fftorque, sizeof(float));
-    memcpy(&_tx_msg.data[MSGTX_ADDR_KP_SCALE], &_comm_kp_scale, sizeof(float));
-    memcpy(&_tx_msg.data[MSGTX_ADDR_KD_SCALE], &_comm_kd_scale, sizeof(float));
-    memcpy(&_tx_msg.data[MSGTX_ADDR_MAXTORQU], &_comm_maxtorqu, sizeof(float));
+    memcpy(&_tx_msg.data[6], &_comm_position, sizeof(float));
+    memcpy(&_tx_msg.data[10], &_comm_velocity, sizeof(float));
+    memcpy(&_tx_msg.data[14], &_comm_fftorque, sizeof(float));
+    memcpy(&_tx_msg.data[18], &_comm_kp_scale, sizeof(float));
+    memcpy(&_tx_msg.data[22], &_comm_kd_scale, sizeof(float));
+    memcpy(&_tx_msg.data[26], &_comm_maxtorqu, sizeof(float));
+
+    // print the set_commands frame
+    //std::cout<<("set_commands to moteus : ");
+	//std::copy(std::begin(_tx_msg.data), std::end(_tx_msg.data), std::ostream_iterator<int>(std::cout, " "));
+	//std::cout << "" << std::endl;
 
     if(!_can_device_ptr->Send(_tx_msg)){
         std::cout << "Sent command error" << std::endl;
@@ -100,6 +128,7 @@ bool MoteusPcanMotor::get_feedback(float& position, float& velocity, float& torq
         position = _position;   
         velocity = _velocity;
         torque = _torque;
+        _comm_position = position;
         return true;
     }
 }
