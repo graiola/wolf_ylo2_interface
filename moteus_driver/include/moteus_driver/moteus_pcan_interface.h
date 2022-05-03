@@ -17,7 +17,6 @@ public:
     ~MoteusPcanInterface();
     bool is_initialized();
     bool is_running();
-    //void start();
     void stop();
 
     std::map<int, MoteusPcanMotorPtr> _motors;
@@ -30,8 +29,6 @@ private:
     std::string _interface;
     PCANDevice _can_device;
     CANDevice::Config_t _can_config;
-    //std::shared_ptr<std::thread> _loop_thread;
-    //void loop();
 };
 
 #endif
