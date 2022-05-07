@@ -117,19 +117,17 @@ void ylo2RobotHw::read()
 
     //TODO: modify this function to queru all 12 motors,separatly, to reduce the usleep,
     // and call it before the for
-    send_query_only_command(idx); // feed Peak Rx queue
+    //send_query_only_command(idx); // feed Peak Rx queue
     // The maximum of 64 data bytes per CAN FD frame can be transmitted with bit rates up to 12 Mbit/s. 
-    usleep(100); // add a small pause, to let time for rx slot feed. (tested with 10  => some errors!)
+    //usleep(300); // add a small pause, to let time for rx slot feed. (tested with 10  => some errors!)
     read_rx_queue(idx, tmp_pos_, tmp_vel_, tmp_tor_); // query values;
 
     joint_position_[jj] = static_cast<double>(sign*tmp_pos_*red);
     joint_velocity_[jj] = static_cast<double>(tmp_vel_);   // measured in revolutions / s
     joint_effort_[jj]   = static_cast<double>(tmp_tor_);   // measured in N*m
-    if(idx == 9){
-      std::cout << "query joints: " << idx << " pos: " << joint_position_[jj] << std::endl;
-    }
   }
 
+  usleep(100);
 
   // Publish the IMU data NOTE: missing covariances
   if(imu_pub_.get() && imu_pub_->trylock())
@@ -154,11 +152,14 @@ void ylo2RobotHw::write()
 {
   for (unsigned int jj = 0; jj < n_dof_; ++jj)
     {
-      auto idxx = motor_adapters_[jj].getIdx();
-      //send_tau(idxx, static_cast<float>(joint_effort_command_[jj]));
-      //send_tau(idxx, 0.00);
+      auto idx = motor_adapters_[jj].getIdx();
+      send_tau(idx, static_cast<float>(joint_effort_command_[jj]));
+      //send_tau(idx, 0.00);
       //std::cout << "idx: " << idxx << " and tau: " << float (joint_effort_command_[jj]) << std::endl;
     }
+
+  usleep(100);
+
 }
 
 void ylo2RobotHw::send_zero_command()
@@ -171,10 +172,10 @@ void ylo2RobotHw::startup_routine()
 {
   for (unsigned int jj = 0; jj < n_dof_; ++jj)
   {
-    auto idx = motor_adapters_[jj].getIdx();
-    stop(idx);
-    usleep(100);
+    auto idx1 = motor_adapters_[jj].getIdx();
+    stop(idx1);
   }
+  usleep(300000);
   std::cout << "startup_routine Done." << std::endl;
 }
 
