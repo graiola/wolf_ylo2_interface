@@ -61,8 +61,8 @@ bool PCANDevice::Open(const std::string &device_id, Config_t &config, bool bUseR
     // fd_ = pcanfd_open(device_id.c_str(), OFD_BITRATE | OFD_BRPTSEGSJW | OFD_DBITRATE | OFD_BRPTSEGSJW | OFD_CLOCKHZ | PCANFD_INIT_FD, <brp>, <tseg1>, <tseg2>, <sjw>, <d_brp>, <d_tseg1>, <d_tseg2>, <d_sjw>, config.clock_freq);
 
     // modify rx query to non blocking mode (if an empty message, return an error code, but doesn't wait for a correct frame)
-    fd_ = pcanfd_open(device_id.c_str(), OFD_NONBLOCKING | OFD_BITRATE | OFD_BRPTSEGSJW | OFD_DBITRATE | OFD_BRPTSEGSJW | OFD_CLOCKHZ | PCANFD_INIT_FD, 1, 50, 29, 10, 1, 8, 7, 12, config.clock_freq);
-    //fd_ = pcanfd_open(device_id.c_str(), OFD_BITRATE | OFD_BRPTSEGSJW | OFD_DBITRATE | OFD_BRPTSEGSJW | OFD_CLOCKHZ | PCANFD_INIT_FD, 1, 50, 29, 10, 1, 8, 7, 12, config.clock_freq);
+    //fd_ = pcanfd_open(device_id.c_str(), OFD_NONBLOCKING | OFD_BITRATE | OFD_BRPTSEGSJW | OFD_DBITRATE | OFD_BRPTSEGSJW | OFD_CLOCKHZ | PCANFD_INIT_FD, 1, 50, 29, 10, 1, 8, 7, 12, config.clock_freq);
+    fd_ = pcanfd_open(device_id.c_str(), OFD_BITRATE | OFD_BRPTSEGSJW | OFD_DBITRATE | OFD_BRPTSEGSJW | OFD_CLOCKHZ | PCANFD_INIT_FD, 1, 50, 29, 10, 1, 8, 7, 12, config.clock_freq);
 
     if (fd_ < 0)
     {
