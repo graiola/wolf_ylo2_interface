@@ -52,7 +52,9 @@ public:
 
     // Receive Buffer Size. For now match max CANFD Frame Size
     // TODO: Support CAN Classic + Multi Packet 
-    static constexpr uint16_t kBufferSizeRX = 64;
+    static constexpr uint16_t kBufferSizeRX = 32;
+    //static constexpr uint16_t kBufferSizeRX = 64;
+
 
     // Length to Data Length Code Conversion LUT
     static constexpr uint8_t DLC_LUT[] = {
