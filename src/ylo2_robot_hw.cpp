@@ -26,22 +26,22 @@ ylo2RobotHw::ylo2RobotHw()
   // LF
   /*HAA*/ motor_adapters_[0].setIdx(1);   motor_adapters_[0].setSign(-1);  motor_adapters_[0].setReduction(6.0); // épaule.
   /*HFE*/ motor_adapters_[1].setIdx(2);   motor_adapters_[1].setSign(-1);  motor_adapters_[1].setReduction(6.0); // coude.
-  /*KFE*/ motor_adapters_[2].setIdx(3);   motor_adapters_[2].setSign(-1);  motor_adapters_[2].setReduction(9.0); // hanche.
+  /*KFE*/ motor_adapters_[2].setIdx(3);   motor_adapters_[2].setSign(-1);  motor_adapters_[2].setReduction(7.5); // hanche.
 
   // LH
   /*HAA*/ motor_adapters_[3].setIdx(7);   motor_adapters_[3].setSign(1);   motor_adapters_[3].setReduction(6.0);
   /*HFE*/ motor_adapters_[4].setIdx(8);   motor_adapters_[4].setSign(-1);  motor_adapters_[4].setReduction(6.0);
-  /*KFE*/ motor_adapters_[5].setIdx(9);   motor_adapters_[5].setSign(-1);  motor_adapters_[5].setReduction(9.0);
+  /*KFE*/ motor_adapters_[5].setIdx(9);   motor_adapters_[5].setSign(-1);  motor_adapters_[5].setReduction(7.5);
 
   // RF
   /*HAA*/ motor_adapters_[6].setIdx(4);   motor_adapters_[6].setSign(-1);  motor_adapters_[6].setReduction(6.0);
   /*HFE*/ motor_adapters_[7].setIdx(5);   motor_adapters_[7].setSign(1);   motor_adapters_[7].setReduction(6.0);
-  /*KFE*/ motor_adapters_[8].setIdx(6);   motor_adapters_[8].setSign(1);   motor_adapters_[8].setReduction(9.0);
+  /*KFE*/ motor_adapters_[8].setIdx(6);   motor_adapters_[8].setSign(1);   motor_adapters_[8].setReduction(7.5);
 
   // RH
   /*HAA*/ motor_adapters_[9].setIdx(10);  motor_adapters_[9].setSign(1);   motor_adapters_[9].setReduction(6.0);
   /*HFE*/ motor_adapters_[10].setIdx(11); motor_adapters_[10].setSign(1);  motor_adapters_[10].setReduction(6.0);
-  /*KFE*/ motor_adapters_[11].setIdx(12); motor_adapters_[11].setSign(1);  motor_adapters_[11].setReduction(9.0);
+  /*KFE*/ motor_adapters_[11].setIdx(12); motor_adapters_[11].setSign(1);  motor_adapters_[11].setReduction(7.5);
 }
 
 ylo2RobotHw::~ylo2RobotHw()
@@ -119,14 +119,17 @@ void ylo2RobotHw::read()
     // and call it before the for
     send_query_only_command(idx); // feed Peak Rx queue
     // The maximum of 64 data bytes per CAN FD frame can be transmitted with bit rates up to 12 Mbit/s. 
-    usleep(50); // add a small pause, to let time for rx slot feed. (tested with 10  => some errors!)
+    usleep(100); // add a small pause, to let time for rx slot feed. (tested with 10  => some errors!)
     read_rx_queue(idx, tmp_pos_, tmp_vel_, tmp_tor_); // query values;
 
     joint_position_[jj] = static_cast<double>(sign*tmp_pos_*red);
     joint_velocity_[jj] = static_cast<double>(tmp_vel_);   // measured in revolutions / s
     joint_effort_[jj]   = static_cast<double>(tmp_tor_);   // measured in N*m
-    //std::cout << "query joints: " << idx << " pos: " << joint_position_[jj] << std::endl;
+    if(idx == 9){
+      std::cout << "query joints: " << idx << " pos: " << joint_position_[jj] << std::endl;
+    }
   }
+
 
   // Publish the IMU data NOTE: missing covariances
   if(imu_pub_.get() && imu_pub_->trylock())
@@ -153,6 +156,7 @@ void ylo2RobotHw::write()
     {
       auto idxx = motor_adapters_[jj].getIdx();
       //send_tau(idxx, static_cast<float>(joint_effort_command_[jj]));
+      //send_tau(idxx, 0.00);
       //std::cout << "idx: " << idxx << " and tau: " << float (joint_effort_command_[jj]) << std::endl;
     }
 }
