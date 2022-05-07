@@ -2,7 +2,7 @@
 
 MoteusPcanInterface::MoteusPcanInterface(const std::string& interface, const std::vector<int>& ids)
     : _initialized(false)
-    , _running(false)
+    //, _running(false)
     , _fail_count(0)
     , _interface(interface)
 {
