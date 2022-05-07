@@ -5,6 +5,7 @@
 #include <string.h> 
 #include <mutex>
 #include <iterator>
+#include <math.h>
 
 #include "moteus_pcan_motor.h"
 

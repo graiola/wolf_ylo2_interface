@@ -42,7 +42,7 @@ bool MoteusPcanController::set_command(int id, float fftorque){
     }
     return true;
 }
-/*
+
 bool MoteusPcanController::all_running(){
     for(const auto& interface: _interfaces){
         if(!interface->is_running()){
@@ -51,4 +51,4 @@ bool MoteusPcanController::all_running(){
     }
     return true;
 }
-*/
+
