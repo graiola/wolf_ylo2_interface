@@ -26,10 +26,40 @@ MoteusPcanMotor::MoteusPcanMotor(uint32_t id, PCANDevice* can_device_ptr)
 
     // TX QUERY ONLY PACKAGE
     _msg_tx_query_only.id = 0x8000 | id; // in moteus lib, for example 0x8002 means 80 = query values, and 02 = ID
-    _msg_tx_query_only.length = 2;
+    _msg_tx_query_only.length = 32;
     // Query
     _msg_tx_query_only.data[0] = 0x1F; // Read floats (0x1C) | Read 3 registers (0x03)
     _msg_tx_query_only.data[1] = 0x01; // Starting register: POSITION, VELOCITY, TORQUE
+    _msg_tx_query_only.data[2] = 0x50;
+    _msg_tx_query_only.data[3] = 0x50;
+    _msg_tx_query_only.data[4] = 0x50;
+    _msg_tx_query_only.data[5] = 0x50;
+    _msg_tx_query_only.data[6] = 0x50;
+    _msg_tx_query_only.data[7] = 0x50;
+    _msg_tx_query_only.data[8] = 0x50;
+    _msg_tx_query_only.data[9] = 0x50;
+    _msg_tx_query_only.data[10] = 0x50;
+    _msg_tx_query_only.data[11] = 0x50;
+    _msg_tx_query_only.data[12] = 0x50;
+    _msg_tx_query_only.data[13] = 0x50;
+    _msg_tx_query_only.data[14] = 0x50;
+    _msg_tx_query_only.data[15] = 0x50;
+    _msg_tx_query_only.data[16] = 0x50;
+    _msg_tx_query_only.data[17] = 0x50;
+    _msg_tx_query_only.data[18] = 0x50;
+    _msg_tx_query_only.data[19] = 0x50;
+    _msg_tx_query_only.data[20] = 0x50;
+    _msg_tx_query_only.data[21] = 0x50;
+    _msg_tx_query_only.data[22] = 0x50;
+    _msg_tx_query_only.data[23] = 0x50;
+    _msg_tx_query_only.data[24] = 0x50;
+    _msg_tx_query_only.data[25] = 0x50;
+    _msg_tx_query_only.data[26] = 0x50;
+    _msg_tx_query_only.data[27] = 0x50;
+    _msg_tx_query_only.data[28] = 0x50;
+    _msg_tx_query_only.data[29] = 0x50;
+    _msg_tx_query_only.data[30] = 0x50;
+    _msg_tx_query_only.data[31] = 0x50;
 
 
     // TX STOP PACKAGE
@@ -61,17 +91,17 @@ MoteusPcanMotor::MoteusPcanMotor(uint32_t id, PCANDevice* can_device_ptr)
     _tx_msg.data[4] = 0x06; // Write 6 registers
     _tx_msg.data[5] = 0x20; // Starting register: POSITION_COMM, VELOCITY_COMM, FFTORQUE_COMM, KP_SCALE, KD_SCALE, MAX_TORQUE
     // Query
-    //_tx_msg.data[30] = 0x1F; // Read floats (0x1C) | Read 3 registers (0x03)
-    //_tx_msg.data[31] = 0x01; // Starting register: POSITION, VELOCITY, TORQUE
-    _tx_msg.data[30] = 0x50; // nul
-    _tx_msg.data[31] = 0x50; // nul
+    _tx_msg.data[30] = 0x1F; // Read floats (0x1C) | Read 3 registers (0x03)
+    _tx_msg.data[31] = 0x01; // Starting register: POSITION, VELOCITY, TORQUE
+   // _tx_msg.data[30] = 0x50; // nul
+   // _tx_msg.data[31] = 0x50; // nul
 
     // Initial values
     _comm_position = NAN;
-    _comm_velocity = 0.0;
-    _comm_fftorque = 0.5;
-    _comm_kp_scale = 0.0;
-    _comm_kd_scale = 0.0;
+    _comm_velocity = 0;
+    _comm_fftorque = 0;
+    _comm_kp_scale = 0;
+    _comm_kd_scale = 0;
     _comm_maxtorqu = 0.5; // NaN for max
 }
 
@@ -129,6 +159,6 @@ bool MoteusPcanMotor::get_feedback(float& position, float& velocity, float& torq
     position = _position;   
     velocity = _velocity;
     torque = _torque;
-    _comm_position = position;
+    //_comm_position = position;
     return true;
 }
