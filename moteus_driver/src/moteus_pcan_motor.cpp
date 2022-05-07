@@ -61,11 +61,13 @@ MoteusPcanMotor::MoteusPcanMotor(uint32_t id, PCANDevice* can_device_ptr)
     _tx_msg.data[4] = 0x06; // Write 6 registers
     _tx_msg.data[5] = 0x20; // Starting register: POSITION_COMM, VELOCITY_COMM, FFTORQUE_COMM, KP_SCALE, KD_SCALE, MAX_TORQUE
     // Query
-    _tx_msg.data[30] = 0x1F; // Read floats (0x1C) | Read 3 registers (0x03)
-    _tx_msg.data[31] = 0x01; // Starting register: POSITION, VELOCITY, TORQUE
+    //_tx_msg.data[30] = 0x1F; // Read floats (0x1C) | Read 3 registers (0x03)
+    //_tx_msg.data[31] = 0x01; // Starting register: POSITION, VELOCITY, TORQUE
+    _tx_msg.data[30] = 0x50; // nul
+    _tx_msg.data[31] = 0x50; // nul
 
     // Initial values
-    _comm_position = 0.0;
+    _comm_position = NAN;
     _comm_velocity = 0.0;
     _comm_fftorque = 0.5;
     _comm_kp_scale = 0.0;

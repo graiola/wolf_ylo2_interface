@@ -41,14 +41,14 @@ bool MoteusPcanInterface::is_initialized(){
 }
 
 bool MoteusPcanInterface::is_running(){
-    //std::lock_guard<std::mutex> guard(_running_mutex);
+    std::lock_guard<std::mutex> guard(_running_mutex);
     std::cout <<" is_running "<< std::endl;
     return _running;
 }
 
 void MoteusPcanInterface::stop(){
     {
-        //std::lock_guard<std::mutex> guard(_running_mutex);
+        std::lock_guard<std::mutex> guard(_running_mutex);
         _running = false;
     }
     // _loop_thread->join();
