@@ -101,8 +101,9 @@ void ylo2RobotHw::read()
 void ylo2RobotHw::write(){
   for (unsigned int jj = 0; jj < n_dof_; jj++){
       auto ids  = command.motor_adapters_[jj].getIdx();
+      auto sign = command.motor_adapters_[jj].getSign();
       int port  = command.motor_adapters_[jj].getPort();
-      command.send_commands(ids, port, static_cast<float>(joint_effort_command_[jj])); 
+      command.send_commands(ids, port, sign*static_cast<float>(joint_effort_command_[jj])); 
       //std::cout << "write to jj = " << jj << " with tau = " << static_cast<float>(joint_effort_command_[jj]) << std::endl;     
       usleep(120);
   }
