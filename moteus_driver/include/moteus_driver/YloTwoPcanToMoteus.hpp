@@ -108,7 +108,7 @@ class YloTwoPcanToMoteus{
     float _comm_fftorque = 0.0; // variable Tau
     float _comm_kp_scale = 0.0;
     float _comm_kd_scale = 0.0;
-    float _comm_maxtorque = 0.5; // Max possible torque is NAN value
+    float _comm_maxtorque = 3.0; // Max possible torque is NAN value
 
     float _position; // query variables
     float _velocity;
