@@ -51,31 +51,34 @@ void ylo2RobotHw::init(const ros::NodeHandle& nh, bool dry_run)
 
 void ylo2RobotHw::startup_routine()
 {
-  command.initialize();
+  command.peak_fdcan_board_initialization();
   usleep(200);
-  command.send_stop_commands();
-  usleep(200);
+  command.check_initial_ground_pose();
   std::cout << "startup_routine Done." << std::endl;
+  usleep(200);
+  command.send_moteus_TX_frame(8005, PCAN_DEV2, 0.5);
 }
 
 void ylo2RobotHw::read()
 {
   for (unsigned int jj = 0; jj < n_dof_; jj++)
   {
-    // Reset
-    tmp_pos_ = 0.0;
-    tmp_vel_ = 0.0;
-    tmp_tor_ = 0.0;
-    auto ids  = command.motor_adapters_[jj].getIdx();
-    auto sign = command.motor_adapters_[jj].getSign();
-    auto red  = command.motor_adapters_[jj].getReduction();
-    int port  = command.motor_adapters_[jj].getPort();
+    // Reset values
+    float RX_pos = 0.0;
+    float RX_vel = 0.0;
+    float RX_tor = 0.0;
+    float RX_volt = 0.0;
+    float RX_temp = 0.0;
+    float RX_fault = 0.0;
 
-    command.get_feedback(ids, port, tmp_pos_, tmp_vel_, tmp_tor_);  // query values;
-    //std::cout << "read from jj = " << jj << " with pos = " << tmp_pos_ << std::endl;
-    joint_position_[jj] = static_cast<double>(sign*tmp_pos_*red);
-    joint_velocity_[jj] = static_cast<double>(tmp_vel_);   // measured in revolutions / s
-    joint_effort_[jj]   = static_cast<double>(tmp_tor_);   // measured in N*m
+    auto ids  = command.motor_adapters_[jj].getIdx();
+    int port  = command.motor_adapters_[jj].getPort();
+    auto sign = command.motor_adapters_[jj].getSign();
+
+    command.read_moteus_RX_queue(ids, port, RX_pos, RX_vel, RX_tor, RX_volt, RX_temp, RX_fault);  // query values;
+    joint_position_[jj] = static_cast<double>(sign*RX_pos);
+    joint_velocity_[jj] = static_cast<double>(RX_vel);   // measured in revolutions / s
+    joint_effort_[jj]   = static_cast<double>(RX_tor);   // measured in N*m
     usleep(120);
   }
 
@@ -103,14 +106,13 @@ void ylo2RobotHw::write(){
       auto ids  = command.motor_adapters_[jj].getIdx();
       auto sign = command.motor_adapters_[jj].getSign();
       int port  = command.motor_adapters_[jj].getPort();
-      command.send_commands(ids, port, sign*static_cast<float>(joint_effort_command_[jj])); 
-      //std::cout << "write to jj = " << jj << " with tau = " << static_cast<float>(joint_effort_command_[jj]) << std::endl;     
+      command.send_moteus_TX_frame(ids, port, sign*static_cast<float>(joint_effort_command_[jj])); 
       usleep(120);
   }
 }
 
+// usefull command ?
 void ylo2RobotHw::send_zero_command(){
   std::array<float, 60> zero_command = {0};
-  //TODO fonction zeroing_command
 }
 } // namespace

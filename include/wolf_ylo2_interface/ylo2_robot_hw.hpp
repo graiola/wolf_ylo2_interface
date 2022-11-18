@@ -21,11 +21,6 @@ public:
   void read();
   void write();
 
-  float tmp_pos_ = 0.0;
-  float tmp_vel_ = 0.0;
-  float tmp_tor_ = 0.0;
-
-
 private:
 
   /** @brief IMU realtime publisher */
