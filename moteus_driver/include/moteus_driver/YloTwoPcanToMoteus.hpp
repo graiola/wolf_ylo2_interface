@@ -38,7 +38,7 @@
     38 - over temperature - the maximum configured temperature has been exceeded
     39 - outside limit - an attempt was made to start position control while outside the bounds configured by servopos.position_min and servopos.position_max.*/
 
-/* power board RX bytes adress */ // TODO check adresses
+/* power board RX bytes adress */ // TODO check adress
 #define MSGPBRX_ADDR_STATE          0x02       
 #define MSGPBRX_ADDR_FAULT_CODE     0x06  
 #define MSGPBRX_ADDR_SWITCH_STATUS  0x0A

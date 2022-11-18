@@ -1,5 +1,5 @@
 /*
-Copyright (c) 08/2022, Vincent FOUCAULT
+Copyright (c) 08/2022, Vincent FOUCAULT 
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
