@@ -1,5 +1,5 @@
 /*
-Copyright (c) 08/2022, Vincent FOUCAULT 
+Copyright (c) 08/2022, Vincent FOUCAULT
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -34,6 +34,9 @@ YloTwoPcanToMoteus::YloTwoPcanToMoteus()
 
   // NOTE: we should load that from file
   motor_adapters_.resize(12);  // exact motors order, on Ylo2
+
+  // FOR CHAMP CONTROLLER : Left Front, Right Front, Left Hind, Right Hind
+  // ex : 3,4,5 => Right Front Leg Hip, Upper Leg, Knee respectively
 
   //                   IDX                             SIGN                            REDUCTION                          PCAN BOARD PORTS
   // LF
@@ -178,7 +181,7 @@ bool YloTwoPcanToMoteus::read_moteus_RX_queue(int id, int port, float& position,
         memcpy(&_position, &moteus_rx_msg.DATA[MSGRX_ADDR_POSITION], sizeof(float));
         memcpy(&_velocity, &moteus_rx_msg.DATA[MSGRX_ADDR_VELOCITY], sizeof(float));
         memcpy(&_torque,   &moteus_rx_msg.DATA[MSGRX_ADDR_TORQUE],   sizeof(float));
-        position    = _position*(2*M_PI);   
+        position    = _position;   
         velocity    = _velocity;
         torque      = _torque;
         return true;}

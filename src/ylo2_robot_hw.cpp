@@ -75,7 +75,7 @@ void ylo2RobotHw::read()
     auto sign = command.motor_adapters_[jj].getSign();
 
     command.read_moteus_RX_queue(ids, port, RX_pos, RX_vel, RX_tor, RX_volt, RX_temp, RX_fault);  // query values;
-    joint_position_[jj] = static_cast<double>(sign*RX_pos);
+    joint_position_[jj] = static_cast<double>(sign*(RX_pos*2*M_PI)); // joint angle converted to radians
     joint_velocity_[jj] = static_cast<double>(RX_vel);   // measured in revolutions / s
     joint_effort_[jj]   = static_cast<double>(RX_tor);   // measured in N*m
     usleep(120);
