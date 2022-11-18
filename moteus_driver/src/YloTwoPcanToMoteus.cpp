@@ -35,9 +35,6 @@ YloTwoPcanToMoteus::YloTwoPcanToMoteus()
   // NOTE: we should load that from file
   motor_adapters_.resize(12);  // exact motors order, on Ylo2
 
-  // FOR CHAMP CONTROLLER : Left Front, Right Front, Left Hind, Right Hind
-  // ex : 3,4,5 => Right Front Leg Hip, Upper Leg, Knee respectively
-
   //                   IDX                             SIGN                            REDUCTION                          PCAN BOARD PORTS
   // LF
   /*HAA*/ motor_adapters_[0].setIdx(3);  motor_adapters_[0].setSign(-1); motor_adapters_[0].setPort(PCAN_DEV1);
