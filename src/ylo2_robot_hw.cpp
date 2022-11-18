@@ -56,7 +56,6 @@ void ylo2RobotHw::startup_routine()
   command.check_initial_ground_pose();
   std::cout << "startup_routine Done." << std::endl;
   usleep(200);
-  command.send_moteus_TX_frame(8005, PCAN_DEV2, 0.5);
 }
 
 void ylo2RobotHw::read()
