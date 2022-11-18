@@ -38,7 +38,7 @@
     38 - over temperature - the maximum configured temperature has been exceeded
     39 - outside limit - an attempt was made to start position control while outside the bounds configured by servopos.position_min and servopos.position_max.*/
 
-/* power board RX bytes adress */ // TODO check adress
+/* power board RX bytes adress */ // TODO check adresses
 #define MSGPBRX_ADDR_STATE          0x02       
 #define MSGPBRX_ADDR_FAULT_CODE     0x06  
 #define MSGPBRX_ADDR_SWITCH_STATUS  0x0A
@@ -164,10 +164,10 @@ class YloTwoPcanToMoteus{
 
     float _comm_position      = NAN;
     float _comm_velocity      = 0.0;
-    float _comm_fftorque      = 0.0; // variable Tau
+    float _comm_fftorque      = 2.0; // variable Tau
     float _comm_kp_scale      = 0.0;
     float _comm_kd_scale      = 0.0;
-    float _comm_maxtorque     = 1.0; // Max possible torque is NAN value
+    float _comm_maxtorque     = 2.0; // Max possible torque is NAN value
 
     /* query variables for moteus controllers */
     float _position     = 0.0;
