@@ -8,5 +8,7 @@ status :
 --------
 - robot motors controller lib => moteus_driver (using a Peak M2 CanFD 4 ports board)  OK
 - robot zeroing                                                                       OK
-- robot joints order from 1 to 12, FL, FR, HL, HR                                     OK    
+- robot joints order from 1 to 12, FL, FR, HL, HR                                     OK
+- can frames (send and receive) structure and format                                Checked
+- functions tested, working							       Checked
 - robot joints directions                                                             TODO
