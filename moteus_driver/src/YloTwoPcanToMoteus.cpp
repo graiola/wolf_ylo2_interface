@@ -178,7 +178,7 @@ bool YloTwoPcanToMoteus::read_moteus_RX_queue(int id, int port, float& position,
         memcpy(&_position, &moteus_rx_msg.DATA[MSGRX_ADDR_POSITION], sizeof(float));
         memcpy(&_velocity, &moteus_rx_msg.DATA[MSGRX_ADDR_VELOCITY], sizeof(float));
         memcpy(&_torque,   &moteus_rx_msg.DATA[MSGRX_ADDR_TORQUE],   sizeof(float));
-        position    = _position;   
+        position    = _position*(2*M_PI);   
         velocity    = _velocity;
         torque      = _torque;
         return true;}
@@ -198,9 +198,9 @@ bool YloTwoPcanToMoteus::send_moteus_zero_order(int id, int port, float zero_pos
     CAN_GetErrorText(Status, 0, strMsg);
     if(Status == PCAN_ERROR_OK){
         return true;}
-    else
+    else{
         ROS_INFO("--ERROR IN WRITING : send_moteus_zero_order()--");
-        return false;      
+        return false;}   
 }
 
 
@@ -215,9 +215,9 @@ bool YloTwoPcanToMoteus::send_power_board_order(){
     CAN_GetErrorText(Status, 0, strMsg);
     if(Status == PCAN_ERROR_OK){
         return(true);}
-    else
+    else{
         std::cout << "error into send_power_board_order(). Status = " << strMsg << std::endl;
-        return false;
+        return false;}
 }
 
 
