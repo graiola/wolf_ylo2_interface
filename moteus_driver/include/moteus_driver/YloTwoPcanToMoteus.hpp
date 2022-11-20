@@ -189,10 +189,10 @@ class YloTwoPcanToMoteus{
     float _energy         = 0.0;
 
     //  zero position of controllers, to check
-    std::vector<float>initial_ground_joints_pose = {-0.05, -0.18, 0.4,  //  3, 1, 2
-                                                     0.05, -0.18, 0.4,  //  9, 7, 8
-                                                     0.05, 0.18, -0.4,  //  6, 4, 5
-                                                    -0.05, 0.18, -0.4}; // 12, 10, 11
+    std::vector<float>initial_ground_joints_pose = {-0.050883, -0.186976, 0.434587,  //  3, 1, 2
+                                                     0.050883, -0.186976, 0.434587,  //  9, 7, 8
+                                                     0.050883, 0.186976, -0.434587,  //  6, 4, 5
+                                                    -0.050883, 0.186976, -0.434587}; // 12, 10, 11
 
     float calibration_error = 0.018; // 9 degrees
 };

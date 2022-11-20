@@ -6,10 +6,11 @@ Ylo2 robot official repository is available [here](https://github.com/elpimous/y
 
 status :
 --------
-- robot motors controller lib => moteus_driver (using a Peak M2 CanFD 4 ports board)  OK
-- robot zeroing                                                                       OK
-- robot joints order from 1 to 12, FL, FR, HL, HR                                     OK
-- read values from Moteus are about 360°.  Needed to convert to radians               OK                
-- can frames (send and receive) structure and format                                Checked
-- functions tested, working							       Checked
-- robot joints directions                                                             TODO
+- robot motors controller lib => moteus_driver (using a Peak M2 CanFD 4 ports board)..OK
+- robot zeroing.......................................................................OK
+- read values from Moteus are about 360°.  Needed to convert to radians...............OK                
+- can frames (send and receive) structure and format..................................OK
+- functions tested, working...........................................................OK
+- robot joints order and direction....................................................OK
+- imu directions and test.............................................................TODO
+- first standup test..................................................................TODO
