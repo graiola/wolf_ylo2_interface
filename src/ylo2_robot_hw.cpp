@@ -41,6 +41,13 @@ void ylo2RobotHw::init(const ros::NodeHandle& nh, bool dry_run)
     ROS_ERROR_NAMED(CLASS_NAME,"Failed to register joint interface.");
     return;
   }
+  // Hardware interfaces: IMU
+    auto imu_name = loadImuLinkNameFromSRDF();
+    if(!imu_name.empty())
+    {
+      WolfRobotHwInterface::initializeImuInterface(imu_name);
+      registerInterface(&imu_sensor_interface_);
+    }
 
   if(!dry_run)
       //std::cout << "Not exist anymore Program changed !" << std::endl;
@@ -97,6 +104,7 @@ void ylo2RobotHw::read()
     imu_pub_->msg_.linear_acceleration.z = imu_lin_acc_[2];
     imu_pub_->msg_.header.stamp = ros::Time::now();
     imu_pub_->unlockAndPublish();
+
   }
 }
 
