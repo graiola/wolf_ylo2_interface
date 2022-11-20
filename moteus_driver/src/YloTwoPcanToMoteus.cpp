@@ -44,15 +44,15 @@ YloTwoPcanToMoteus::YloTwoPcanToMoteus()
   /*HFE*/ motor_adapters_[1].setIdx(1);  motor_adapters_[1].setSign(-1); motor_adapters_[1].setPort(PCAN_DEV1);
   /*KFE*/ motor_adapters_[2].setIdx(2);  motor_adapters_[2].setSign(-1); motor_adapters_[2].setPort(PCAN_DEV1);
 
-  // LH
-  /*HAA*/ motor_adapters_[3].setIdx(6);  motor_adapters_[3].setSign(1);  motor_adapters_[3].setPort(PCAN_DEV2);
-  /*HFE*/ motor_adapters_[4].setIdx(4);  motor_adapters_[4].setSign(-1); motor_adapters_[4].setPort(PCAN_DEV2);
-  /*KFE*/ motor_adapters_[5].setIdx(5);  motor_adapters_[5].setSign(-1); motor_adapters_[5].setPort(PCAN_DEV2);
-
   // RF
-  /*HAA*/ motor_adapters_[6].setIdx(9);  motor_adapters_[6].setSign(-1); motor_adapters_[6].setPort(PCAN_DEV3);
-  /*HFE*/ motor_adapters_[7].setIdx(7);  motor_adapters_[7].setSign(1);  motor_adapters_[7].setPort(PCAN_DEV3);
-  /*KFE*/ motor_adapters_[8].setIdx(8);  motor_adapters_[8].setSign(1);  motor_adapters_[8].setPort(PCAN_DEV3);
+  /*HAA*/ motor_adapters_[3].setIdx(9);  motor_adapters_[3].setSign(1); motor_adapters_[3].setPort(PCAN_DEV3);
+  /*HFE*/ motor_adapters_[4].setIdx(7);  motor_adapters_[4].setSign(-1);  motor_adapters_[4].setPort(PCAN_DEV3);
+  /*KFE*/ motor_adapters_[5].setIdx(8);  motor_adapters_[5].setSign(-1);  motor_adapters_[5].setPort(PCAN_DEV3);
+
+  // LH
+  /*HAA*/ motor_adapters_[6].setIdx(6);  motor_adapters_[6].setSign(-1);  motor_adapters_[6].setPort(PCAN_DEV2);
+  /*HFE*/ motor_adapters_[7].setIdx(4);  motor_adapters_[7].setSign(1); motor_adapters_[7].setPort(PCAN_DEV2);
+  /*KFE*/ motor_adapters_[8].setIdx(5);  motor_adapters_[8].setSign(1); motor_adapters_[8].setPort(PCAN_DEV2);
 
   // RH
   /*HAA*/ motor_adapters_[9].setIdx(12);  motor_adapters_[9].setSign(1);  motor_adapters_[9].setPort(PCAN_DEV4);
@@ -94,12 +94,12 @@ YloTwoPcanToMoteus::YloTwoPcanToMoteus()
   moteus_tx_msg.DATA[0] =  0x0c; // WRITE_REGISTERS - Type.F32
   moteus_tx_msg.DATA[1] =  0x06; // 6 registers
   moteus_tx_msg.DATA[2] =  0x20; // Starting at reg 0x020 POSITION
-  //moteus_tx_msg.DATA[3] =  0x00; // position value
-  //moteus_tx_msg.DATA[7] =  0x00; // velocity value
-  //moteus_tx_msg.DATA[11] = 0x00; // torque value
-  //moteus_tx_msg.DATA[15] = 0x00; // Kp value
-  //moteus_tx_msg.DATA[19] = 0x00; // Kd value
-  //moteus_tx_msg.DATA[23] = 0x00; // Max torque
+  moteus_tx_msg.DATA[3] =  _comm_position; // position value
+  moteus_tx_msg.DATA[7] =  _comm_velocity; // velocity value
+  moteus_tx_msg.DATA[11] = _comm_fftorque; // torque value
+  moteus_tx_msg.DATA[15] = _comm_kp_scale; // Kp value
+  moteus_tx_msg.DATA[19] = _comm_kd_scale; // Kd value
+  moteus_tx_msg.DATA[23] = _comm_maxtorque; // Max torque
   moteus_tx_msg.DATA[27] = 0x1F; // READ_REGISTERS - F32 3 registers
   moteus_tx_msg.DATA[28] = 0x01; // Starting at reg 0x001(POSITION)
   moteus_tx_msg.DATA[29] = 0x13; // READ_REGISTERS - INT8 3 registers
@@ -152,12 +152,7 @@ bool YloTwoPcanToMoteus::send_moteus_stop_order(int id, int port){
 bool YloTwoPcanToMoteus::send_moteus_TX_frame(int id, int port, float fftorque){
     _comm_fftorque = fftorque;
     moteus_tx_msg.ID = 0x8000 | id;
-    memcpy(&moteus_tx_msg.DATA[3], &_comm_position, sizeof(float)); // NAN
-    memcpy(&moteus_tx_msg.DATA[7], &_comm_velocity, sizeof(float)); // 0.0
     memcpy(&moteus_tx_msg.DATA[11], &_comm_fftorque, sizeof(float)); // 0.0
-    memcpy(&moteus_tx_msg.DATA[15], &_comm_kp_scale, sizeof(float)); // 0.0
-    memcpy(&moteus_tx_msg.DATA[19], &_comm_kd_scale, sizeof(float)); // 0.0
-    memcpy(&moteus_tx_msg.DATA[23], &_comm_maxtorque, sizeof(float));// 2.0
     //std::cout<<("commands to send to moteus : ");
 	//std::copy(std::begin(moteus_tx_msg.DATA), std::end(moteus_tx_msg.DATA), std::ostream_iterator<int>(std::cout, " "));
 	//std::cout << "" << std::endl;
@@ -181,9 +176,15 @@ bool YloTwoPcanToMoteus::read_moteus_RX_queue(int id, int port, float& position,
         memcpy(&_position, &moteus_rx_msg.DATA[MSGRX_ADDR_POSITION], sizeof(float));
         memcpy(&_velocity, &moteus_rx_msg.DATA[MSGRX_ADDR_VELOCITY], sizeof(float));
         memcpy(&_torque,   &moteus_rx_msg.DATA[MSGRX_ADDR_TORQUE],   sizeof(float));
+        memcpy(&_voltage, &moteus_rx_msg.DATA[MSGRX_ADDR_VOLTAGE], sizeof(float));
+        memcpy(&_temperature, &moteus_rx_msg.DATA[MSGRX_ADDR_TEMPERATURE], sizeof(float));
+        memcpy(&_fault,   &moteus_rx_msg.DATA[MSGRX_ADDR_FAULT],   sizeof(float));
         position    = _position;   
         velocity    = _velocity;
         torque      = _torque;
+        voltage     = _voltage;
+        temperature = _temperature;
+        fault       = _fault;
         return true;}
     else
         return false;
