@@ -38,6 +38,6 @@
     <rosparam file="$(find wolf_ylo2_interface)/params/joint_state_publisher.yaml" ns="/$(arg robot_name)" command="load"/>
 
     <!-- start robot state publisher -->
-    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen" ns="/$(arg robot_name)" />
+    <!--<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen" ns="/$(arg robot_name)" />-->
 
 </launch>
