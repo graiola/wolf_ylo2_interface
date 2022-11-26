@@ -87,6 +87,19 @@ void ylo2RobotHw::read()
     joint_effort_[jj]   = static_cast<double>(RX_tor);   // measured in N*m
     usleep(120);
   }
+  float state = 0.0;
+  float fault_code = 0.0;
+  float switch_status = 0.0;
+  float lock_time = 0.0;
+  float boot_time = 0.0;
+  float out_volt = 0.0;
+  float out_curr = 0.0;
+  float board_temp = 0.0;
+  float energy = 0.0;
+  command.read_power_board_RX_queue(state, fault_code, switch_status, out_volt, out_curr, board_temp);
+  std::cout << " board state " << state << std::endl;
+  std::cout << " board fault_code " << fault_code << std::endl;
+  std::cout << " board switch_status " << switch_status << std::endl;
 
   // IMU OK !
   // Publish the IMU data NOTE: missing covariances
@@ -113,11 +126,11 @@ void ylo2RobotHw::write(){
       auto ids  = command.motor_adapters_[jj].getIdx();
       auto sign = command.motor_adapters_[jj].getSign();
       int port  = command.motor_adapters_[jj].getPort();
-      command.send_moteus_TX_frame(ids, port, sign*static_cast<float>(joint_effort_command_[jj])); 
+      //command.send_moteus_TX_frame(ids, port, sign*static_cast<float>(joint_effort_command_[jj])); 
       usleep(120);
   }
+  command.send_power_board_order();
 }
-
 // usefull command ?
 void ylo2RobotHw::send_zero_command(){
   std::array<float, 60> zero_command = {0};

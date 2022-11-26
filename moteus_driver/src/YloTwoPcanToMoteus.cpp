@@ -60,9 +60,9 @@ YloTwoPcanToMoteus::YloTwoPcanToMoteus()
   /*power_board*/ motor_adapters_[32].setIdx(32); motor_adapters_[32].setPort(PCAN_DEV3);
 
   /* ------------------------ TX STOP PACKAGE ------------------------------ */
-  _stop.ID = 0x00;
+  _stop.ID      = 0x00;
   _stop.MSGTYPE = PCAN_MESSAGE_BRS | PCAN_MESSAGE_EXTENDED | PCAN_MESSAGE_FD;
-  _stop.DLC = 7;
+  _stop.DLC     = 7;
   _stop.DATA[0] = 0x01; // Write uint8 (0x00) | Write 1 register (0x01)
   _stop.DATA[1] = 0x00; // Register to write: MODE
   _stop.DATA[2] = 0x00; // Value to write: STOPPED MODE
@@ -72,45 +72,66 @@ YloTwoPcanToMoteus::YloTwoPcanToMoteus()
   _stop.DATA[6] = 0x0D; // Starting register: VOLTAGE, TEMPERATURE, FAULT
 
   /* ------------------------- TX ZERO PACKAGE ------------------------------ */
-  _zero.ID = 0x00;
-  _zero.MSGTYPE = PCAN_MESSAGE_BRS | PCAN_MESSAGE_EXTENDED | PCAN_MESSAGE_FD;
-  _zero.DLC = 9; // 12 bytes ... ex : 0db0029a99193e    for a zero pos = 0.15
-  _zero.DATA[0] = 0x0D; // write float (0x0C) | write 1 register (0x01)
-  _zero.DATA[1] = 0xB0; // Register to write: 0x130(REZERO)
-  _zero.DATA[2] = 0x02;
-  _zero.DATA[7] = 0x1F; // Read floats (0x1C) | Read 3 registers (0x03)
-  _zero.DATA[8] = 0x01; // Starting register: POSITION, VELOCITY, TORQUE
-  _zero.DATA[9] = 0x1F; // Read floats (0x1C) | Read 3 registers (0x03)
+  _zero.ID       = 0x00;
+  _zero.MSGTYPE  = PCAN_MESSAGE_BRS | PCAN_MESSAGE_EXTENDED | PCAN_MESSAGE_FD;
+  _zero.DLC      = 9; // 12 bytes ... ex : 0db0029a99193e    for a zero pos = 0.15
+  _zero.DATA[0]  = 0x0D; // write float (0x0C) | write 1 register (0x01)
+  _zero.DATA[1]  = 0xB0; // Register to write: 0x130(REZERO)
+  _zero.DATA[2]  = 0x02;
+  _zero.DATA[7]  = 0x1F; // Read floats (0x1C) | Read 3 registers (0x03)
+  _zero.DATA[8]  = 0x01; // Starting register: POSITION, VELOCITY, TORQUE
+  _zero.DATA[9]  = 0x1F; // Read floats (0x1C) | Read 3 registers (0x03)
   _zero.DATA[10] = 0x0D;// Starting register: VOLTAGE, TEMPERATURE, FAULT
   _zero.DATA[10] = 0x50;// pad unused bytes to 0x50
 
   /* --------------------------TX POS PACKAGE -------------------------------*/
-  moteus_tx_msg.ID = 0x00;
-  moteus_tx_msg.MSGTYPE = PCAN_MESSAGE_BRS | PCAN_MESSAGE_EXTENDED | PCAN_MESSAGE_FD;
-  moteus_tx_msg.DLC = 14; // 13 = 32 bytes
-  moteus_tx_msg.DATA[0] =  0x0c; // WRITE_REGISTERS - Type.F32
-  moteus_tx_msg.DATA[1] =  0x06; // 6 registers
-  moteus_tx_msg.DATA[2] =  0x20; // Starting at reg 0x020 POSITION
-  moteus_tx_msg.DATA[3] =  _comm_position; // position value
-  moteus_tx_msg.DATA[7] =  _comm_velocity; // velocity value
-  moteus_tx_msg.DATA[11] = _comm_fftorque; // torque value
-  moteus_tx_msg.DATA[15] = _comm_kp_scale; // Kp value
-  moteus_tx_msg.DATA[19] = _comm_kd_scale; // Kd value
-  moteus_tx_msg.DATA[23] = _comm_maxtorque; // Max torque
-  moteus_tx_msg.DATA[27] = 0x1F; // READ_REGISTERS - F32 3 registers
-  moteus_tx_msg.DATA[28] = 0x01; // Starting at reg 0x001(POSITION)
-  moteus_tx_msg.DATA[29] = 0x13; // READ_REGISTERS - INT8 3 registers
-  moteus_tx_msg.DATA[30] = 0x0D; // Starting at reg 0x00d(VOLTAGE)
-  moteus_tx_msg.DATA[31] = 0x50; // Padding a NOP byte (moteus protocol)
+  moteus_tx_msg.ID       = 0x00;
+  moteus_tx_msg.MSGTYPE  = PCAN_MESSAGE_BRS | PCAN_MESSAGE_EXTENDED | PCAN_MESSAGE_FD;
+  moteus_tx_msg.DLC      = 14; // 12 = 24 bytes, 13 = 32 bytes, 14 = 48 bytes
+  moteus_tx_msg.DATA[0]  =  0x01; // WRITE_REGISTERS - Type.INT8 1 registers
+  moteus_tx_msg.DATA[1]  =  0x00; // Starting at reg 0x000(MODE)
+  moteus_tx_msg.DATA[2]  =  0x0a; // Reg 0x000(MODE) = 10(POSITION)
+  moteus_tx_msg.DATA[3]  =  0x0c; // WRITE_REGISTERS - Type.F32
+  moteus_tx_msg.DATA[4]  =  0x06; // 6 registers
+  moteus_tx_msg.DATA[5]  =  0x20; // Starting at reg 0x020 POSITION
+  moteus_tx_msg.DATA[6]  = _comm_position;
+  moteus_tx_msg.DATA[10] = _comm_velocity;
+  moteus_tx_msg.DATA[14] = _comm_fftorque;
+  moteus_tx_msg.DATA[18] = _comm_kp;
+  moteus_tx_msg.DATA[22] = _comm_kd;
+  moteus_tx_msg.DATA[26] = _comm_maxtorque;
+  moteus_tx_msg.DATA[30] = 0x1F; // READ_REGISTERS - F32 3 registers
+  moteus_tx_msg.DATA[31] = 0x01; // Starting at reg 0x001(POSITION)
+  moteus_tx_msg.DATA[32] = 0x13; // READ_REGISTERS - INT8 3 registers
+  moteus_tx_msg.DATA[33] = 0x0D; // Starting at reg 0x00d(VOLTAGE)
+  moteus_tx_msg.DATA[34] = 0x50; // Padding a NOP byte (moteus protocol)
+  moteus_tx_msg.DATA[35] = 0x50; //    ...................
+  moteus_tx_msg.DATA[36] = 0x50;
+  moteus_tx_msg.DATA[37] = 0x50;
+  moteus_tx_msg.DATA[38] = 0x50;
+  moteus_tx_msg.DATA[39] = 0x50;
+  moteus_tx_msg.DATA[40] = 0x50;
+  moteus_tx_msg.DATA[41] = 0x50;
+  moteus_tx_msg.DATA[42] = 0x50;
+  moteus_tx_msg.DATA[43] = 0x50;
+  moteus_tx_msg.DATA[44] = 0x50;
+  moteus_tx_msg.DATA[45] = 0x50;
+  moteus_tx_msg.DATA[46] = 0x50;
+  moteus_tx_msg.DATA[47] = 0x50;
 
   /* ------------------- TX POWER BOARD PACKAGE -----------------------------*/
-  _power_board_tx_msg.ID = 0x00; // in moteus lib, for example 0x8002 means 80 = query values, and 02 = ID
+  _power_board_tx_msg.ID      = 0x00; // in moteus lib, for example 0x8002 means 80 = query values, and 02 = ID
   _power_board_tx_msg.MSGTYPE = PCAN_MESSAGE_BRS | PCAN_MESSAGE_EXTENDED | PCAN_MESSAGE_FD;
-  _power_board_tx_msg.DLC = 3; // 3 bytes
-  _power_board_tx_msg.DATA[0] = 0x1C; // Read floats (0x1C)
-  _power_board_tx_msg.DATA[1] = 0x09; // Starting register: 0x000 STATE, FAULT CODE, SWITCH STATUS, LOCK TIME, BOOT TIME, OUT VOLT, OUT CURR, TEMP, ENERGY
-  _power_board_tx_msg.DATA[2] = 0x00;
-  // TODO mauvaises adresses !!!
+  _power_board_tx_msg.DLC     = 8;    // 8 = 8 bytes; 9 = 12 bytes
+  _power_board_tx_msg.DATA[0] = 0x05; // write 1 int8 register
+  _power_board_tx_msg.DATA[1] = 0x03; // register 3 = Lock Time
+  _power_board_tx_msg.DATA[2] = 0x4E; // timing 20s
+  _power_board_tx_msg.DATA[3] = 0x20;
+  _power_board_tx_msg.DATA[4] = 0x17; // READ_REGISTERS - INT16, 3 registers
+  _power_board_tx_msg.DATA[5] = 0x00; // Starting register: 0x000 STATE, FAULT CODE, SWITCH STATUS
+  _power_board_tx_msg.DATA[6] = 0x17; // READ_REGISTERS - INT16, 3 registers
+  _power_board_tx_msg.DATA[7] = 0x10; // Starting register: 0x010 Output Voltage, Output Current, Temperature
+
   //--------------------------------------------------------------------------------------------
 }
 
@@ -147,10 +168,19 @@ bool YloTwoPcanToMoteus::send_moteus_stop_order(int id, int port){
 }
 
 bool YloTwoPcanToMoteus::send_moteus_TX_frame(int id, int port, float fftorque){
-    _comm_fftorque = fftorque;
+    _comm_position = NAN;
+    _comm_fftorque = fftorque; // in radians
+    _comm_kp       = 0.0;
+    _comm_kd       = 0.0;
+    _comm_maxtorque = 4.0;
     moteus_tx_msg.ID = 0x8000 | id;
-    memcpy(&moteus_tx_msg.DATA[11], &_comm_fftorque, sizeof(float)); // 0.0
-    //std::cout<<("commands to send to moteus : ");
+    memcpy(&moteus_tx_msg.DATA[06], &_comm_position, sizeof(float));
+    memcpy(&moteus_tx_msg.DATA[14], &_comm_velocity, sizeof(float));
+    memcpy(&moteus_tx_msg.DATA[14], &_comm_fftorque, sizeof(float));
+    memcpy(&moteus_tx_msg.DATA[18], &_comm_kp, sizeof(float));
+    memcpy(&moteus_tx_msg.DATA[22], &_comm_kd, sizeof(float));
+    memcpy(&moteus_tx_msg.DATA[26], &_comm_maxtorque, sizeof(float));
+    //std::cout << "torque = " << _comm_fftorque << std::endl;
 	//std::copy(std::begin(moteus_tx_msg.DATA), std::end(moteus_tx_msg.DATA), std::ostream_iterator<int>(std::cout, " "));
 	//std::cout << "" << std::endl;
     Status = CAN_WriteFD(port, &moteus_tx_msg);
@@ -209,9 +239,10 @@ bool YloTwoPcanToMoteus::send_moteus_zero_order(int id, int port, float zero_pos
 /* POWER BOARD */
 /* WRITE */
 bool YloTwoPcanToMoteus::send_power_board_order(){
-    _power_board_tx_msg.ID = 0x8000 | 32;
-    auto port = PCAN_DEV3;
-    Status = CAN_WriteFD(port, &_power_board_tx_msg);
+    _power_board_tx_msg.ID = 0x8050; // 0x8000  and id = 32
+    //std::copy(std::begin(_power_board_tx_msg.DATA), std::end(_power_board_tx_msg.DATA), std::ostream_iterator<int>(std::cout, " "));
+	//std::cout << "" << std::endl;
+    Status = CAN_WriteFD(PCAN_DEV3, &_power_board_tx_msg);
     usleep(200);
     CAN_GetErrorText(Status, 0, strMsg);
     if(Status == PCAN_ERROR_OK){
@@ -223,37 +254,31 @@ bool YloTwoPcanToMoteus::send_power_board_order(){
 
 
 /* READ */
-bool YloTwoPcanToMoteus::read_power_board_RX_queue(float& state, float& fault_code, float& switch_status, float& lock_time, 
-                                            float& boot_time, float& out_volt, float& out_curr, float& board_temp, float& energy){
-    _power_board_rx_msg.ID = 0x8000 | 32;
-    //auto port = PCAN_DEV3;
-    int port  = motor_adapters_[7].getPort();
-    Status = CAN_ReadFD(port,&_power_board_rx_msg, NULL); // read can port
+bool YloTwoPcanToMoteus::read_power_board_RX_queue(float& state, float& fault_code, float& switch_status, float& out_volt, float& out_curr, float& board_temp){
+    _power_board_rx_msg.ID = 0x8050;
+
+    Status = CAN_ReadFD(PCAN_DEV3,&_power_board_rx_msg, NULL); // read can port
     usleep(200);
+    std::copy(std::begin(_power_board_rx_msg.DATA), std::end(_power_board_rx_msg.DATA), std::ostream_iterator<int>(std::cout, " "));
+	std::cout << "" << std::endl;
     CAN_GetErrorText(Status, 0, strMsg);
-    std::cout << Status;
     if(Status != PCAN_ERROR_QRCVEMPTY){ // rx queue feeded.
         memcpy(&_state, &_power_board_rx_msg.DATA[MSGPBRX_ADDR_STATE], sizeof(float));
         memcpy(&_fault_code, &_power_board_rx_msg.DATA[MSGPBRX_ADDR_FAULT_CODE], sizeof(float));
         memcpy(&_switch_status,   &_power_board_rx_msg.DATA[MSGPBRX_ADDR_SWITCH_STATUS],   sizeof(float));
-        memcpy(&_lock_time, &_power_board_rx_msg.DATA[MSGPBRX_ADDR_LOCK_TIME], sizeof(float));
-        memcpy(&_boot_time, &_power_board_rx_msg.DATA[MSGPBRX_ADDR_BOOT_TIME], sizeof(float));
         memcpy(&_out_volt,   &_power_board_rx_msg.DATA[MSGPBRX_ADDR_OUT_VOLTAGE],   sizeof(float));
         memcpy(&_out_curr,   &_power_board_rx_msg.DATA[MSGPBRX_ADDR_OUT_CURRENT],   sizeof(float));
         memcpy(&_board_temp,   &_power_board_rx_msg.DATA[MSGPBRX_ADDR_TEMPERATURE],   sizeof(float));
-        memcpy(&_energy,   &_power_board_rx_msg.DATA[MSGPBRX_ADDR_ENERGY],   sizeof(float));
         state = _state;   
         fault_code = _fault_code;
         switch_status = _switch_status;
-        lock_time = _lock_time;
-        boot_time = _boot_time;
         out_volt = _out_volt;
         out_curr = _out_curr;
         board_temp = _board_temp;
-        energy = _energy;
         return true;
     }    
     else 
+        std::cout << "error into read_power_board_RX_queue(). Status = " << strMsg << std::endl;
         return false;  
 }
 
@@ -319,7 +344,7 @@ bool YloTwoPcanToMoteus::check_initial_ground_pose(){
 
             // --- CHECKING JOINT STARTUP ANGLE ---
             float value = (std::abs(RX_pos) - std::abs(target_joint_position));
-            float angle_error = value*360;
+            float angle_error = value*360; // turn * 360 to obtain degreed
             ROS_INFO("--Controleur ID : %d ; actual position : %f ; zero target position : %f ; difference : %f ; angle error in degrees : %f degrees", ids, RX_pos, target_joint_position, value, angle_error);
             if(std::abs(std::abs(RX_pos) - std::abs(target_joint_position)) > std::abs(calibration_error)){
                 is_calibrated = false;
@@ -330,7 +355,9 @@ bool YloTwoPcanToMoteus::check_initial_ground_pose(){
         }
         usleep(200);
     }
+
     std::cout << ("") << std::endl;
     ROS_INFO("--ROBOT CALIBRATION CHECKED ----> OK--");
     std::cout << ("") << std::endl;
+    return true;
 }

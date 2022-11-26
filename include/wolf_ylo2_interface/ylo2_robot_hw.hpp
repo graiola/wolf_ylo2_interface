@@ -16,7 +16,6 @@ public:
 
   ylo2RobotHw();
   virtual ~ylo2RobotHw();
-
   void init(const ros::NodeHandle &nh, bool dry_run = false);
   void read();
   void write();

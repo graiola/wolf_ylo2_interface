@@ -104,8 +104,7 @@ class YloTwoPcanToMoteus{
     bool send_power_board_order();
 
     /* query power board to read values*/
-    bool read_power_board_RX_queue(float& state, float& fault_code, float& switch_status, float& lock_time, 
-                                            float& boot_time, float& out_volt, float& out_curr, float& temp, float& energy);
+    bool read_power_board_RX_queue(float& state, float& fault_code, float& switch_status, float& out_volt, float& out_curr, float& board_temp);
 
     /*  initialize Peak canFD board,
             reset the 4 ports.*/
@@ -162,12 +161,12 @@ class YloTwoPcanToMoteus{
     int sign_;
     int port_;
 
-    float _comm_position      = NAN;
-    float _comm_velocity      = 0.0;
-    float _comm_fftorque      = 2.0; // variable Tau
-    float _comm_kp_scale      = 0.0;
-    float _comm_kd_scale      = 0.0;
-    float _comm_maxtorque     = 2.0; // Max possible torque is NAN value
+    float _comm_position      = NAN; // NAN for torque mode
+    float _comm_fftorque      = 0.0; // variable Tau
+    float _comm_velocity      = 0;
+    float _comm_kp            = 0;
+    float _comm_kd            = 0;
+    float _comm_maxtorque     = 0.0; // Max possible torque is NAN value
 
     /* query variables for moteus controllers */
     float _position     = 0.0;
@@ -189,10 +188,10 @@ class YloTwoPcanToMoteus{
     float _energy         = 0.0;
 
     //  zero position of controllers, to check
-    std::vector<float>initial_ground_joints_pose = {-0.050883, -0.186976, 0.434587,  //  3, 1, 2
-                                                     0.050883, -0.186976, 0.434587,  //  9, 7, 8
-                                                     0.050883, 0.186976, -0.434587,  //  6, 4, 5
-                                                    -0.050883, 0.186976, -0.434587}; // 12, 10, 11
+    std::vector<float>initial_ground_joints_pose = {-0.051290, -0.186801, 0.401529,  //  3, 1, 2
+                                                     0.049744, -0.186188, 0.434385,  //  9, 7, 8
+                                                     0.056091, 0.180545, -0.428597,  //  6, 4, 5
+                                                    -0.056315, 0.184779, -0.423850}; // 12, 10, 11
 
     float calibration_error = 0.018; // 9 degrees
 };
