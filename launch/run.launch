@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <launch>
-    <arg name="task_period" default="0.01" />
+    <arg name="task_period" default="0.001" /> <!-- loop rate : 0.001 = 1000hz -->
     <arg name="dry_run" default="false" />
     <arg name="gui"  default="true" />
     <arg name="robot_name"  default="ylo2" />

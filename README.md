@@ -8,8 +8,9 @@ status :
 --------
 - robot motors controller lib => moteus_driver (using a Peak M2 CanFD 4 ports board)..OK
 - robot zeroing.......................................................................OK
-- read values from Moteus are about 360°.  Needed to convert to radians...............OK                
-- can frames (send and receive) structure and format..................................OK
+- read values from Moteus are in turn.  Needed to convert to radians..................OK                
+- joints can frames (send and receive) structure and format...........................OK
+- power board can frames structure and format.........................................TODO
 - functions tested, working...........................................................OK
 - robot joints order and direction....................................................OK
 - imu directions and test.............................................................TODO
