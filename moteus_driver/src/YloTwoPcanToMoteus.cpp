@@ -35,7 +35,7 @@ YloTwoPcanToMoteus::YloTwoPcanToMoteus()
   // NOTE: we should load that from file
   motor_adapters_.resize(12);  // exact motors order, on Ylo2
 
-  //                   IDX                             SIGN                            REDUCTION                          PCAN BOARD PORTS
+  //                   IDX                             SIGN                         PCAN BOARD PORTS
   // LF
   /*HAA*/ motor_adapters_[0].setIdx(3);  motor_adapters_[0].setSign(-1); motor_adapters_[0].setPort(PCAN_DEV1);
   /*HFE*/ motor_adapters_[1].setIdx(1);  motor_adapters_[1].setSign(-1); motor_adapters_[1].setPort(PCAN_DEV1);
@@ -57,7 +57,6 @@ YloTwoPcanToMoteus::YloTwoPcanToMoteus()
   /*KFE*/ motor_adapters_[11].setIdx(11); motor_adapters_[11].setSign(1); motor_adapters_[11].setPort(PCAN_DEV4);
 
   // The default ID for the power_dist is '32'
-  /*power_board*/ motor_adapters_[32].setIdx(32); motor_adapters_[32].setPort(PCAN_DEV3);
 
   /* ------------------------ TX STOP PACKAGE ------------------------------ */
   _stop.ID      = 0x00;
@@ -82,7 +81,7 @@ YloTwoPcanToMoteus::YloTwoPcanToMoteus()
   _zero.DATA[8]  = 0x01; // Starting register: POSITION, VELOCITY, TORQUE
   _zero.DATA[9]  = 0x1F; // Read floats (0x1C) | Read 3 registers (0x03)
   _zero.DATA[10] = 0x0D;// Starting register: VOLTAGE, TEMPERATURE, FAULT
-  _zero.DATA[10] = 0x50;// pad unused bytes to 0x50
+  _zero.DATA[11] = 0x50;// pad unused bytes to 0x50
 
   /* --------------------------TX POS PACKAGE -------------------------------*/
   moteus_tx_msg.ID       = 0x00;
@@ -120,7 +119,7 @@ YloTwoPcanToMoteus::YloTwoPcanToMoteus()
   moteus_tx_msg.DATA[47] = 0x50;
 
   /* ------------------- TX POWER BOARD PACKAGE -----------------------------*/
-  _power_board_tx_msg.ID      = 0x00; // in moteus lib, for example 0x8002 means 80 = query values, and 02 = ID
+  _power_board_tx_msg.ID      = 0x00;
   _power_board_tx_msg.MSGTYPE = PCAN_MESSAGE_BRS | PCAN_MESSAGE_EXTENDED | PCAN_MESSAGE_FD;
   _power_board_tx_msg.DLC     = 8;    // 8 = 8 bytes; 9 = 12 bytes
   _power_board_tx_msg.DATA[0] = 0x05; // write 1 int8 register
@@ -239,7 +238,7 @@ bool YloTwoPcanToMoteus::send_moteus_zero_order(int id, int port, float zero_pos
 /* POWER BOARD */
 /* WRITE */
 bool YloTwoPcanToMoteus::send_power_board_order(){
-    _power_board_tx_msg.ID = 0x8050; // 0x8000  and id = 32
+    _power_board_tx_msg.ID = 0x8000 | 32;
     //std::copy(std::begin(_power_board_tx_msg.DATA), std::end(_power_board_tx_msg.DATA), std::ostream_iterator<int>(std::cout, " "));
 	//std::cout << "" << std::endl;
     Status = CAN_WriteFD(PCAN_DEV3, &_power_board_tx_msg);
@@ -255,8 +254,7 @@ bool YloTwoPcanToMoteus::send_power_board_order(){
 
 /* READ */
 bool YloTwoPcanToMoteus::read_power_board_RX_queue(float& state, float& fault_code, float& switch_status, float& out_volt, float& out_curr, float& board_temp){
-    _power_board_rx_msg.ID = 0x8050;
-
+    _power_board_rx_msg.ID = 0x8000 | 32;
     Status = CAN_ReadFD(PCAN_DEV3,&_power_board_rx_msg, NULL); // read can port
     usleep(200);
     std::copy(std::begin(_power_board_rx_msg.DATA), std::end(_power_board_rx_msg.DATA), std::ostream_iterator<int>(std::cout, " "));

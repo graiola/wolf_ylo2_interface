@@ -39,15 +39,13 @@
     39 - outside limit - an attempt was made to start position control while outside the bounds configured by servopos.position_min and servopos.position_max.*/
 
 /* power board RX bytes adress */ // TODO check adresses
-#define MSGPBRX_ADDR_STATE          0x02       
-#define MSGPBRX_ADDR_FAULT_CODE     0x06  
-#define MSGPBRX_ADDR_SWITCH_STATUS  0x0A
-#define MSGPBRX_ADDR_LOCK_TIME      0x0E
-#define MSGPBRX_ADDR_BOOT_TIME      0x12
-#define MSGPBRX_ADDR_OUT_VOLTAGE    0x16
-#define MSGPBRX_ADDR_OUT_CURRENT    0x1A
-#define MSGPBRX_ADDR_TEMPERATURE    0x1E
-#define MSGPBRX_ADDR_ENERGY         0x22
+#define MSGPBRX_ADDR_STATE          0x02 // 2 bytes per value (int16)   
+#define MSGPBRX_ADDR_FAULT_CODE     0x04  
+#define MSGPBRX_ADDR_SWITCH_STATUS  0x06
+#define MSGPBRX_ADDR_OUT_VOLTAGE    0x08
+#define MSGPBRX_ADDR_OUT_CURRENT    0x0A
+#define MSGPBRX_ADDR_TEMPERATURE    0x0C
+#define MSGPBRX_ADDR_ENERGY         0x0E
 
 // about moteus power board faults errors:
 /* TODO */
