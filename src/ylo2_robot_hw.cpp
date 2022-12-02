@@ -87,28 +87,15 @@ void ylo2RobotHw::read()
     joint_effort_[jj]   = static_cast<double>(RX_tor);   // measured in N*m
     usleep(120);
   }
-  float state = 0.0;
-  float fault_code = 0.0;
-  float switch_status = 0.0;
-  float lock_time = 0.0;
-  float boot_time = 0.0;
-  float out_volt = 0.0;
-  float out_curr = 0.0;
-  float board_temp = 0.0;
-  float energy = 0.0;
-  command.read_power_board_RX_queue(state, fault_code, switch_status, out_volt, out_curr, board_temp);
-  std::cout << " board state " << state << std::endl;
-  std::cout << " board fault_code " << fault_code << std::endl;
-  std::cout << " board switch_status " << switch_status << std::endl;
 
   // IMU OK !
   // Publish the IMU data NOTE: missing covariances
   if(imu_pub_.get() && imu_pub_->trylock())
   {
     imu_pub_->msg_.orientation.w         = imu_orientation_[0];
-    imu_pub_->msg_.orientation.x         = imu_orientation_[1];
-    imu_pub_->msg_.orientation.y         = imu_orientation_[2];
-    imu_pub_->msg_.orientation.z         = imu_orientation_[3];
+    imu_pub_->msg_.orientation.x         = - imu_orientation_[1];
+    imu_pub_->msg_.orientation.y         = - imu_orientation_[2];
+    imu_pub_->msg_.orientation.z         = - imu_orientation_[3];
     imu_pub_->msg_.angular_velocity.x    = imu_ang_vel_[0];
     imu_pub_->msg_.angular_velocity.y    = imu_ang_vel_[1];
     imu_pub_->msg_.angular_velocity.z    = imu_ang_vel_[2];
