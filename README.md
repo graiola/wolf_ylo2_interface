@@ -13,5 +13,5 @@ status :
 - power board can frames structure and format.........................................TODO
 - functions tested, working...........................................................OK
 - robot joints order and direction....................................................OK
-- imu directions and test.............................................................TODO
+- imu directions and test.............................................................OK
 - first standup test..................................................................TODO
