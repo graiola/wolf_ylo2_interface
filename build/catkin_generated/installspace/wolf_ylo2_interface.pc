@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: wolf_ylo2_interface
+Description: Description of wolf_ylo2_interface
+Version: 0.0.1
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: controller_manager realtime_tools wolf_hardware_interface
