@@ -18,7 +18,7 @@ public:
 	~ylo2ROSControl();
 
   /** @brief init */
-	void init();
+  void init(bool dry_run);
 
   /** @brief update */
 	void update(const ros::Time& time, const ros::Duration& period);

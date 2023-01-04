@@ -1,10 +1,13 @@
+<?xml version="1.0" ?>
 <launch>
     <arg name="task_period" default="0.001" />
+    <arg name="dry_run" default="false" />
     <arg name="gui"  default="true" />
     <arg name="robot_name"  default="ylo2" />
 
     <!-- Export some params to the param server -->
     <param name="task_period" value="$(arg task_period)"/>
+    <param name="dry_run" value="$(arg dry_run)"/>
 
     <!-- Load the robot description -->
     <include file="$(find wolf_description_utils)/launch/upload.launch">
@@ -23,8 +26,8 @@
     <node pkg="myahrs_driver" type="myahrs_driver" name="myahrs_driver">
         <param name="port" value="/dev/ttyACM0" />
         <param name="baud_rate" value="115200" />
-        <param name="frame_id" value="trunk" />
-        <param name="parent_frame_id" value="world" />
+        <param name="frame_id" value="trunk_imu" />
+        <param name="parent_frame_id" value="trunk" />
     </node>
 
     <!-- Spawn the trunk publisher -->
@@ -34,16 +37,20 @@
     <!-- Loading joint states publisher configurations from YAML file to parameter server -->
     <rosparam file="$(find wolf_ylo2_interface)/params/joint_state_publisher.yaml" ns="/$(arg robot_name)" command="load"/>
 
+    <!-- Loading joint trajectory controller configurations from YAML file to parameter server -->
+    <rosparam file="$(find wolf_ylo2_interface)/params/joint_trajectory_controller.yaml" ns="/$(arg robot_name)" command="load"/>
+
     <!-- Spawn controllers -->
     <node name="controller_spawner"
           pkg="controller_manager" type="spawner" output="screen"
           ns="/$(arg robot_name)"
-          args="joint_state_publisher" />
+          args="joint_state_publisher joint_trajectory_controller" />
 
     <!-- start robot state publisher -->
     <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen" ns="/$(arg robot_name)" />
 
-    <!-- <node pkg="robot_inertia_publisher" type="robot_inertia_publisher" name="robot_inertia_publisher" output="screen" ns="/$(arg robot_name)" /> -->
+   <!-- Spawn the joint trajectory controller gui -->
+   <node name="joint_trajectory_controller_gui" pkg="rqt_joint_trajectory_controller" type="rqt_joint_trajectory_controller" output="screen"/>
 
     <group if="$(arg gui)">
       <node

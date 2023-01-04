@@ -27,7 +27,7 @@ int main(int argc, char** argv)
 
   ros::NodeHandle n(ns); // load the relative namespace
 
-  ros::Subscriber imu_subscriber = n.subscribe("/imu/data", 20, callback);
+  ros::Subscriber imu_subscriber = n.subscribe("/imu", 20, callback);
 
   ros::spin();
 
