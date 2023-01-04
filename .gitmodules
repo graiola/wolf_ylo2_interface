@@ -1,0 +1,3 @@
+[submodule "witmotion_ros"]
+	path = witmotion_ros
+	url = ../../ElettraSciComp/witmotion_IMU_ros.git
