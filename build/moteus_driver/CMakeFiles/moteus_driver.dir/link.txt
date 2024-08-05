@@ -1,0 +1,1 @@
+/usr/bin/x86_64-linux-gnu-g++-9 -fPIC -g  -shared -Wl,-soname,libmoteus_driver.so -o ../devel/lib/libmoteus_driver.so CMakeFiles/moteus_driver.dir/src/YloTwoPcanToMoteus.cpp.o  -lpthread -lrt -lpcanbasic 
