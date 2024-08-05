@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
   controller_manager
   realtime_tools
   wolf_hardware_interface
+  urdf
   tf
 )
       
@@ -14,6 +15,7 @@ catkin_package(
    controller_manager
    realtime_tools
    wolf_hardware_interface
+   urdf
 )
 
 ##########

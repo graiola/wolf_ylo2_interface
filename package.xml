@@ -15,6 +15,7 @@
   <depend>controller_manager</depend>
   <depend>wolf_hardware_interface</depend>
   <depend>tf</depend>
+  <depend>urdf</depend>
 
   <!-- <test_depend>rostest</test_depend> -->
 
